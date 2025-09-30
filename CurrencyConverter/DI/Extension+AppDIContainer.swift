@@ -14,8 +14,6 @@ extension AppWeaveDI.Container {
       let factory = ModuleFactoryManager()
 
       await factory.registerAll(to: container)
-
     }
-
   }
 }
