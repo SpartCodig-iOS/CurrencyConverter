@@ -7,7 +7,8 @@
 
 
 import AsyncMoya
-@preconcurrency import Moya
+import Moya
+import WeaveDI
 
 public class ExchangeRepositoryImpl: ExchangeRateInterface {
    private let provider = MoyaProvider<ExchangeRateService>(plugins: [MoyaLoggingPlugin()])
@@ -21,4 +22,3 @@ public class ExchangeRepositoryImpl: ExchangeRateInterface {
     return dtos.toDomain()
   }
 }
-
