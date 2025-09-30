@@ -532,7 +532,7 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.22.3;
+				minimumVersion = 1.22.0;
 			};
 		};
 		7FECD3BA2E8A3173005D1583 /* XCRemoteSwiftPackageReference "WeaveDI" */ = {
@@ -563,8 +563,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Roy-wonji/AsyncMoya";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.5;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7FECD3C62E8A32E9005D1583 /* XCRemoteSwiftPackageReference "Reusable" */ = {
