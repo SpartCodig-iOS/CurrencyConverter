@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import WeaveDI
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -13,7 +14,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Override point for customization after application launch.
+
+    WeaveDI.Container.bootstrapInTask { @DIContainerActor _ in
+      await AppDIManager.shared.registerDefaultDependencies()
+    }
     return true
   }
 
