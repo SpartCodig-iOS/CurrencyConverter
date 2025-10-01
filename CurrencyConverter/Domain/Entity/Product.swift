@@ -12,4 +12,5 @@ struct Product {
   let subtitle: String
   let price: String
   let rate: Double
+  let isFavorite: Bool
 }
