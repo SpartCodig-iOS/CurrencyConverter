@@ -59,7 +59,6 @@ open class BaseViewController<
 
     #if DEBUG
     performanceTimer = CFAbsoluteTimeGetCurrent()
-    print("🚀 [\(String(describing: type(of: self)))] viewDidLoad 시작")
     #endif
 
     setupView()
@@ -67,27 +66,16 @@ open class BaseViewController<
     bindActions()
     bindState()
 
-    #if DEBUG
-    let elapsed = CFAbsoluteTimeGetCurrent() - performanceTimer
-    print("⏱️ [\(String(describing: type(of: self)))] viewDidLoad 완료: \(String(format: "%.3f", elapsed))초")
-    #endif
   }
 
   open override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
-    #if DEBUG
-    print("👀 [\(String(describing: type(of: self)))] viewWillAppear")
-    #endif
   }
 
   // MARK: - Memory Management
 
   deinit {
-    #if DEBUG
-    print("♻️ [\(String(describing: type(of: self)))] deinit - 메모리 해제")
-    #endif
-
     // Combine cancellables 정리
     cancellables.removeAll()
   }
@@ -203,18 +191,13 @@ open class BaseViewController<
   }
 
   /// 안전한 액션 전송 (에러 처리 포함)
+  /// 안전한 액션 전송 (로그 + 공통 후처리 훅)
+  @MainActor
   public func safeSend(_ action: Feature.Action) {
-    do {
-      store.send(action)
-      #if DEBUG
-      print("✅ [\(String(describing: type(of: self)))] Action sent: \(action)")
-      #endif
-    } catch {
-      #if DEBUG
-      print("🚨 [\(String(describing: type(of: self)))] Action send failed: \(error)")
-      #endif
-      handleError("액션 처리 중 오류가 발생했습니다: \(error.localizedDescription)")
-    }
+    store.send(action)
+    #if DEBUG
+    print(" [\(String(describing: type(of: self)))] Action sent: \(action)")
+    #endif
   }
 }
 
