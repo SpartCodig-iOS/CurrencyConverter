@@ -16,6 +16,7 @@ extension WeaveDI.Container {
     let repositories = [
       helper.exchangeRepositoryModule(),
       helper.favoriteCurrencyRepositoryModule(),
+      helper.exchangeRateCacheRepositoryModule(),
       // 추가 Repository들...
     ]
     
@@ -30,6 +31,7 @@ extension WeaveDI.Container {
     let useCases = [
       helper.exchangeUseCaseModule(),
       helper.favoriteCurrencyUseCaseModule(),
+      helper.exchangeRateCacheUseCaseModule(),
       // 추가 UseCase들...
     ]
     
