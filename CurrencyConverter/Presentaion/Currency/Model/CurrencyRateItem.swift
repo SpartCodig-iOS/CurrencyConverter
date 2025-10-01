@@ -10,9 +10,11 @@ import Foundation
 struct CurrencyRateItem: Equatable, Hashable {
   let code: String
   let rate: Double
+  let trend: RateTrend
 
-  init(code: String, rate: Double) {
+  init(code: String, rate: Double, trend: RateTrend) {
     self.code = code
     self.rate = rate
+    self.trend = trend
   }
 }

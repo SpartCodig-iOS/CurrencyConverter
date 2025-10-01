@@ -13,6 +13,11 @@ import SwiftUI
 
 final class CalculateView: BaseView {
 
+  private let scrollView = UIScrollView().then {
+    $0.alwaysBounceVertical = true
+    $0.showsVerticalScrollIndicator = true
+  }
+
   private let rootView = UIView()
 
   private let titleLabel = UILabel.createLabel(
@@ -78,15 +83,6 @@ final class CalculateView: BaseView {
     }
 
 
-  private let calculateResultLabel = UILabel.createLabel(
-
-    text: "0.00",
-    family: .bold,
-    size: 16,
-    color: .secondaryLabel,
-    alignment: .center
-  )
-
   private let calculateResultDescriptionLabel = UILabel.createLabel(
     text: "계산 결과가 여기에 표시됩니다",
     family: .semiBold,
@@ -97,7 +93,8 @@ final class CalculateView: BaseView {
 
   override func addView() {
     super.addView()
-    addSubview(rootView)
+    addSubview(scrollView)
+    scrollView.addSubview(rootView)
   }
 
   override func defineLayout() {
@@ -122,9 +119,6 @@ final class CalculateView: BaseView {
         .height(40)
         .marginBottom(30)
 
-      flex.addItem(calculateResultLabel)
-        .marginBottom(10)
-
       flex.addItem(calculateResultDescriptionLabel)
 
 
@@ -138,9 +132,24 @@ final class CalculateView: BaseView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    rootView.pin.all(pin.safeArea)
+    scrollView.frame = bounds
+
+    let safeInsets = pin.safeArea
+    let contentWidth = max(scrollView.bounds.width - (safeInsets.left + safeInsets.right), 0)
+
+    rootView.pin
+      .top(safeInsets.top)
+      .left(safeInsets.left)
+      .width(contentWidth)
+
     rootView.flex.marginHorizontal(20)
     rootView.flex.layout(mode: .adjustHeight)
+
+    let contentHeight = rootView.frame.height + safeInsets.top + safeInsets.bottom
+    let minHeight = scrollView.bounds.height
+    scrollView.contentSize = CGSize(width: scrollView.bounds.width, height: max(contentHeight, minHeight))
+    scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: safeInsets.bottom, right: 0)
+    scrollView.verticalScrollIndicatorInsets = UIEdgeInsets(top: safeInsets.top, left: 0, bottom: safeInsets.bottom, right: 0)
     calculateButton.layer.cornerRadius = 10
   }
 
@@ -156,10 +165,9 @@ final class CalculateView: BaseView {
     }
   }
 
-  func configure(countryCode: String, countryName: String, resultCurrency: String ) {
+  func configure(countryCode: String, countryName: String) {
     currencyCodeLabel.text = countryCode
     currencyCountryName.text = countryName
-    calculateResultLabel.text = resultCurrency
   }
 
   func updateCurrencyCode(_ code: String) {
@@ -170,17 +178,12 @@ final class CalculateView: BaseView {
     currencyCountryName.text = name
   }
 
-  func updateConvertedAmount(_ displayAmount: String, currencyCode: String) {
-    calculateResultLabel.text = "\(displayAmount) \(currencyCode)"
-  }
-
-  func updateResultDescription(base: String, target: String) {
-    guard !base.isEmpty, !target.isEmpty else {
+  func updateConversionSummary(_ summary: String) {
+    if summary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
       calculateResultDescriptionLabel.text = "계산 결과가 여기에 표시됩니다"
-      return
+    } else {
+      calculateResultDescriptionLabel.text = summary
     }
-
-    calculateResultDescriptionLabel.text = "\(base) 금액을 \(target)으로 변환"
   }
 }
 

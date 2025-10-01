@@ -23,6 +23,7 @@ public struct CalculatorReducer {
     var exchangeRate: Double
     var errorMessage: String? = nil
     var errorToken: Int = 0
+    var conversionSummary: String = ""
 
     public init(
       currencyCode: String,
@@ -49,6 +50,7 @@ public struct CalculatorReducer {
   public enum InnerAction: Equatable {
     case updateConvertedAmount(Double)
     case setError(String?)
+    case clearConversion
   }
 
   public var body: some Reducer<State, Action> {
@@ -72,6 +74,12 @@ public struct CalculatorReducer {
         let locale = Locale(identifier: "ko_KR")
         state.currencyName = locale.currencyDisplayName(for: state.currencyCode)
         state.errorMessage = nil
+        state.conversionSummary = makeSummary(
+          baseAmount: amountValue(from: state.amount),
+          convertedText: state.convertedAmountText,
+          baseCode: state.baseCurrencyCode,
+          targetCode: state.currencyCode
+        )
         return .none
 
       case .calculateButtonTapped:
@@ -79,12 +87,14 @@ public struct CalculatorReducer {
           case .empty:
             return .concatenate([
               .send(.inner(.setError(nil))),
+              .send(.inner(.clearConversion)),
               .send(.inner(.setError("금액을 입력해주세요")))
             ])
 
           case .invalid:
             return .concatenate([
               .send(.inner(.setError(nil))),
+              .send(.inner(.clearConversion)),
               .send(.inner(.setError("올바른 숫자를 입력해주세요")))
             ])
 
@@ -102,12 +112,13 @@ public struct CalculatorReducer {
           case .empty:
             return .concatenate([
               .send(.inner(.setError(nil))),
-              .send(.inner(.updateConvertedAmount(0)))
+              .send(.inner(.clearConversion))
             ])
 
           case .invalid:
             return .concatenate([
               .send(.inner(.setError(nil))),
+              .send(.inner(.clearConversion)),
               .send(.inner(.setError("올바른 숫자를 입력해주세요")))
             ])
 
@@ -130,7 +141,14 @@ public struct CalculatorReducer {
         let rawResult = amount * state.exchangeRate
         let rounded = (rawResult * 100).rounded() / 100
         state.convertedAmount = rounded
-        state.convertedAmountText = rounded.formattedDecimal(fractionDigits: 2)
+        let convertedText = rounded.formattedDecimal(fractionDigits: 2)
+        state.convertedAmountText = convertedText
+        state.conversionSummary = makeSummary(
+          baseAmount: Optional(amount),
+          convertedText: convertedText,
+          baseCode: state.baseCurrencyCode,
+          targetCode: state.currencyCode
+        )
         return .none
 
       case .setError(let message):
@@ -141,7 +159,34 @@ public struct CalculatorReducer {
           state.errorMessage = nil
         }
         return .none
+
+      case .clearConversion:
+        state.convertedAmount = 0
+        state.convertedAmountText = "0.00"
+        state.conversionSummary = ""
+        return .none
     }
   }
 
+  private func amountValue(from raw: String) -> Double? {
+    switch AmountParser.parse(raw) {
+      case .value(let value):
+        return value
+      case .empty, .invalid:
+        return nil
+    }
+  }
+
+  private func makeSummary(
+    baseAmount: Double?,
+    convertedText: String,
+    baseCode: String,
+    targetCode: String
+  ) -> String {
+    guard let baseAmount else { return "" }
+    let baseText = baseAmount.formattedDecimal(fractionDigits: 2)
+    let sourceCode = baseCode.isEmpty ? "-" : baseCode
+    let targetCodeText = targetCode.isEmpty ? "-" : targetCode
+    return "\(baseText) \(sourceCode) → \(convertedText) \(targetCodeText)"
+  }
 }

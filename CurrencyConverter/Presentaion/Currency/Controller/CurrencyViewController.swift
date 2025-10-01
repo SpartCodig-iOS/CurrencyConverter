@@ -34,8 +34,7 @@ final class CurrencyViewController: BaseViewController<CurrencyView, CurrencyRed
     super.bindActions()
 
     // 화면 진입 시 환율 요청
-    safeSend(.async(.fetchExchangeRates))
-    safeSend(.async(.fetchFavorites))
+    safeSend(.view(.onAppear))
 
     rootView.refreshControl
       .publisher(for: .valueChanged)
@@ -118,7 +117,8 @@ final class CurrencyViewController: BaseViewController<CurrencyView, CurrencyRed
           subtitle: name,
           price: item.rate.decimalString(item.rate),
           rate: item.rate,
-          isFavorite: favorites.contains(item.code)
+          isFavorite: favorites.contains(item.code),
+          trend: item.trend
         )
       }
   }

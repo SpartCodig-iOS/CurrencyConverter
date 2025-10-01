@@ -147,10 +147,10 @@ final class CurrencyView: BaseView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-
+    let safeInsets = pin.safeArea
     fixedHeaderContainer.pin
       .top(pin.safeArea)
-      .horizontally()
+      .horizontally(safeInsets)
     fixedHeaderContainer.flex.layout(mode: .adjustHeight)
 
     tableView.pin

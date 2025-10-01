@@ -57,10 +57,6 @@ final class CalculatorViewController: BaseViewController<CalculateView, Calculat
       .sink { [weak self] code in
         guard let self else { return }
         self.rootView.updateCurrencyCode(code)
-        self.rootView.updateResultDescription(
-          base: self.viewStore.baseCurrencyCode,
-          target: code
-        )
       }
       .store(in: &cancellables)
 
@@ -70,20 +66,9 @@ final class CalculatorViewController: BaseViewController<CalculateView, Calculat
       }
       .store(in: &cancellables)
 
-    optimizedPublisher(\.baseCurrencyCode)
-      .sink { [weak self] base in
-        guard let self else { return }
-        self.rootView.updateResultDescription(
-          base: base,
-          target: self.viewStore.currencyCode
-        )
-      }
-      .store(in: &cancellables)
-
-    optimizedPublisher(\.convertedAmountText)
-      .sink { [weak self] amountText in
-        guard let self else { return }
-        self.rootView.updateConvertedAmount(amountText, currencyCode: self.viewStore.currencyCode)
+    optimizedPublisher(\.conversionSummary)
+      .sink { [weak self] summary in
+        self?.rootView.updateConversionSummary(summary)
       }
       .store(in: &cancellables)
   }

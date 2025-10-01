@@ -60,6 +60,14 @@ final class ProductCell: UITableViewCell, Reusable {
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
   }
 
+  private let trendImageView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
+    $0.tintColor = .label
+    $0.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 12, weight: .bold)
+    $0.setContentHuggingPriority(.required, for: .horizontal)
+    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+  }
+
   private let favoriteButton = UIButton(type: .system).then {
     $0.setContentHuggingPriority(.required, for: .horizontal)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -84,6 +92,7 @@ final class ProductCell: UITableViewCell, Reusable {
     static let paddingV: CGFloat = 10
     static let priceWidthMin: CGFloat = 60
     static let priceWidthPad: CGFloat = 2
+    static let trendWidth: CGFloat = 16
   }
 
   // MARK: Init
@@ -115,7 +124,11 @@ final class ProductCell: UITableViewCell, Reusable {
           col.addItem(titleLabel)
           col.addItem(subtitleLabel).marginTop(4)
         }
-        row.addItem(priceLabel).shrink(0).marginLeft(8)
+        row.addItem(trendImageView)
+          .width(Layout.trendWidth)
+          .height(Layout.trendWidth)
+          .marginRight(4)
+        row.addItem(priceLabel).shrink(0).marginLeft(4)
         row.addItem(favoriteButton)
           .marginLeft(8)
       }
@@ -137,6 +150,20 @@ final class ProductCell: UITableViewCell, Reusable {
     } else {
       favoriteButton.setImage(UIImage(systemName: symbolName), for: .normal)
       favoriteButton.tintColor = tint
+    }
+
+    switch product.trend {
+      case .up:
+        trendImageView.image = UIImage(systemName: "arrowtriangle.up.fill")?.withRenderingMode(.alwaysTemplate)
+        trendImageView.tintColor = .systemGreen
+        trendImageView.alpha = 1
+      case .down:
+        trendImageView.image = UIImage(systemName: "arrowtriangle.down.fill")?.withRenderingMode(.alwaysTemplate)
+        trendImageView.tintColor = .systemRed
+        trendImageView.alpha = 1
+      case .none:
+        trendImageView.image = nil
+        trendImageView.alpha = 0
     }
 
     // 가격 고정폭 확보 (intrinsic 기준)
@@ -169,6 +196,8 @@ final class ProductCell: UITableViewCell, Reusable {
     priceLabel.text = nil
     priceLabel.flex.minWidth(0)
     favoriteButton.setImage(nil, for: .normal)
+    trendImageView.image = nil
+    trendImageView.alpha = 0
     onFavoriteTapped = nil
     contentView.flex.markDirty()
   }
