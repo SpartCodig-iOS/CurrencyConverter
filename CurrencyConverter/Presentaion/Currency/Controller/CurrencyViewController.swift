@@ -108,7 +108,8 @@ final class CurrencyViewController: BaseViewController<CurrencyView, CurrencyRed
         return Product(
           title: "\(code)",
           subtitle: name,
-          price: rate.decimalString(rate)
+          price: rate.decimalString(rate),
+          rate: rate
         )
       }
   }
@@ -132,7 +133,14 @@ extension CurrencyViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
     let selectedProduct = products[indexPath.row]
-    safeSend(.navigation(.navigateToCalculator(currencyCode: selectedProduct.title)))
+    safeSend(
+      .navigation(
+        .navigateToCalculator(
+          currencyCode: selectedProduct.title,
+          currencyRate: selectedProduct.rate
+        )
+      )
+    )
   }
 
   func scrollViewDidScroll(_ scrollView: UIScrollView) {

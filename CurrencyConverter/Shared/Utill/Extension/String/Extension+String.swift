@@ -8,13 +8,19 @@
 import Foundation
 
 public extension Double {
-    func decimalString(_ value: Double, fractionDigits: Int = 4) -> String {
-    let format = NumberFormatter()
-    format.numberStyle = .decimal
-    format.maximumFractionDigits = fractionDigits
-    format.minimumFractionDigits = fractionDigits
-    format.roundingMode = .halfUp
-    return format.string(from: NSNumber(value: value)) ?? "\(value)"
+  func formattedDecimal(fractionDigits: Int = 4, locale: Locale = .current) -> String {
+    let formatter = NumberFormatter()
+    formatter.locale = locale
+    formatter.numberStyle = .decimal
+    formatter.maximumFractionDigits = fractionDigits
+    formatter.minimumFractionDigits = fractionDigits
+    formatter.roundingMode = .halfUp
+    return formatter.string(from: NSNumber(value: self))
+    ?? String(format: "%0.*f", fractionDigits, self)
+  }
+
+  func decimalString(_ value: Double, fractionDigits: Int = 4) -> String {
+    value.formattedDecimal(fractionDigits: fractionDigits)
   }
 }
 

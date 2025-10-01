@@ -18,6 +18,7 @@ public struct CurrencyReducer {
   public struct State: Equatable {
 
     var exchangeRateModel: ExchangeRates?  = nil
+    var baseCurrencyCode: String = ""
     var filteredRates: [String: Double] = [:]
     var displayedRates: [String: Double] = [:]
     var alertMessage: String? = nil
@@ -64,7 +65,7 @@ public struct CurrencyReducer {
 
   //MARK: - NavigationAction
   public enum NavigationAction: Equatable {
-    case navigateToCalculator(currencyCode: String)
+    case navigateToCalculator(currencyCode: String, currencyRate: Double)
   }
 
   @Injected(ExchangeUseCaseImpl.self) var exchangeUseCase
@@ -198,6 +199,7 @@ public struct CurrencyReducer {
         switch result {
           case .success(let exchangeRateData):
             state.exchangeRateModel = exchangeRateData
+            state.baseCurrencyCode = exchangeRateData.base.rawValue
             // 초기 로드 시 전체 리스트 표시
             state.filteredRates = Dictionary(uniqueKeysWithValues:
               exchangeRateData.rates.map { ($0.key.rawValue, $0.value) }
@@ -205,6 +207,7 @@ public struct CurrencyReducer {
 
           case .failure(let error):
             state.exchangeRateModel = nil
+            state.baseCurrencyCode = ""
             state.filteredRates = [:]
             state.displayedRates = [:]
             state.alertMessage = "데이터를 불러올 수 없습니다 \(error.errorDescription ?? "Unknown Error")"
@@ -236,4 +239,3 @@ public struct CurrencyReducer {
     }
   }
 }
-

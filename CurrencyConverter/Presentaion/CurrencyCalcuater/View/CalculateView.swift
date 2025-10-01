@@ -80,7 +80,7 @@ final class CalculateView: BaseView {
 
   private let calculateResultLabel = UILabel.createLabel(
 
-    text: "$10",
+    text: "0.00",
     family: .bold,
     size: 16,
     color: .secondaryLabel,
@@ -150,7 +150,8 @@ final class CalculateView: BaseView {
     if let number = Double(normalized) {
       let formate = NumberFormatter()
       formate.numberStyle = .decimal
-      formate.maximumFractionDigits = 4
+      formate.maximumFractionDigits = 2
+      formate.minimumFractionDigits = 0
       textField.text = formate.string(from: NSNumber(value: number))
     }
   }
@@ -169,11 +170,17 @@ final class CalculateView: BaseView {
     currencyCountryName.text = name
   }
 
-  func updateConvertedAmount(_ amount: Double) {
-    let formatter = NumberFormatter()
-    formatter.numberStyle = .decimal
-    formatter.maximumFractionDigits = 4
-    calculateResultLabel.text = formatter.string(from: NSNumber(value: amount))
+  func updateConvertedAmount(_ displayAmount: String, currencyCode: String) {
+    calculateResultLabel.text = "\(displayAmount) \(currencyCode)"
+  }
+
+  func updateResultDescription(base: String, target: String) {
+    guard !base.isEmpty, !target.isEmpty else {
+      calculateResultDescriptionLabel.text = "계산 결과가 여기에 표시됩니다"
+      return
+    }
+
+    calculateResultDescriptionLabel.text = "\(base) 금액을 \(target)으로 변환"
   }
 }
 

@@ -21,7 +21,6 @@ final class CalculatorViewController: BaseViewController<CalculateView, Calculat
 
   override func configureUI() {
     super.configureUI()
-    title = "환율 계산기"
     view.backgroundColor = .systemBackground
   }
 
@@ -36,10 +35,19 @@ final class CalculatorViewController: BaseViewController<CalculateView, Calculat
       .publisher(for: \.text)
       .compactMap { $0 }
       .sink { [weak self] text in
-        self?.store.send(.set(\.amount, text))
+        self?.safeSend(.view(.amountChanged(text)))
       }
       .store(in: &cancellables)
 
+    rootView.calculateButton
+      .publisher(for: .touchUpInside)
+      .sink { [weak self] in
+        guard let self else { return }
+        let currentText = self.rootView.amountTextField.text ?? ""
+        self.safeSend(.view(.amountChanged(currentText)))
+        self.safeSend(.view(.calculateButtonTapped))
+      }
+      .store(in: &cancellables)
   }
 
   override func bindState() {
@@ -47,7 +55,12 @@ final class CalculatorViewController: BaseViewController<CalculateView, Calculat
 
     optimizedPublisher(\.currencyCode)
       .sink { [weak self] code in
-        self?.rootView.updateCurrencyCode(code)
+        guard let self else { return }
+        self.rootView.updateCurrencyCode(code)
+        self.rootView.updateResultDescription(
+          base: self.viewStore.baseCurrencyCode,
+          target: code
+        )
       }
       .store(in: &cancellables)
 
@@ -57,19 +70,32 @@ final class CalculatorViewController: BaseViewController<CalculateView, Calculat
       }
       .store(in: &cancellables)
 
-    optimizedPublisher(\.convertedAmount)
-      .sink { [weak self] amount in
-        self?.rootView.updateConvertedAmount(amount)
+    optimizedPublisher(\.baseCurrencyCode)
+      .sink { [weak self] base in
+        guard let self else { return }
+        self.rootView.updateResultDescription(
+          base: base,
+          target: self.viewStore.currencyCode
+        )
       }
       .store(in: &cancellables)
 
-    if !store.amount.isEmpty {
-      rootView.calculateButton
-        .publisher(for: .touchUpInside)   // 버튼 탭 이벤트를 Publisher로 감지
-        .sink { [weak self] in            // 구독해서 콜백 실행
-          self?.store.send(.async(.fetchFilterExchangeRate)) // TCA Action 전송
-        }
-        .store(in: &cancellables)         // 메모리 해제 방지용 저장
-    }
+    optimizedPublisher(\.convertedAmountText)
+      .sink { [weak self] amountText in
+        guard let self else { return }
+        self.rootView.updateConvertedAmount(amountText, currencyCode: self.viewStore.currencyCode)
+      }
+      .store(in: &cancellables)
+  }
+
+  override func extractError(from state: CalculatorReducer.State) -> String? {
+    guard let message = state.errorMessage else { return nil }
+    return "\(state.errorToken)|\(message)"
+  }
+
+  override func handleError(_ errorPayload: String) {
+    let components = errorPayload.split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
+    let message = components.count == 2 ? String(components[1]) : errorPayload
+    super.handleError(message)
   }
 }
