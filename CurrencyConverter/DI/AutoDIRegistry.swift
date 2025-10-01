@@ -15,6 +15,7 @@ extension WeaveDI.Container {
   static func registerRepositories() async {
     let repositories = [
       helper.exchangeRepositoryModule(),
+      helper.favoriteCurrencyRepositoryModule(),
       // 추가 Repository들...
     ]
     
@@ -28,6 +29,7 @@ extension WeaveDI.Container {
     
     let useCases = [
       helper.exchangeUseCaseModule(),
+      helper.favoriteCurrencyUseCaseModule(),
       // 추가 UseCase들...
     ]
     
