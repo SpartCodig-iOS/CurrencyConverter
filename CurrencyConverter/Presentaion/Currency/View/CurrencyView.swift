@@ -23,17 +23,14 @@ final class CurrencyView: BaseView {
     text: "환율정보",
     family: .semiBold,
     size: 30,
-    color: .label,
+    color: AppColor.primaryText,
     alignment: .left
   )
 
   let searchBar = UISearchBar().then {
     $0.placeholder = "통화 검색"
     $0.searchBarStyle = .minimal
-    $0.backgroundColor = .systemBackground
-    $0.searchTextField.textColor = .label
-    $0.searchTextField.backgroundColor = .secondarySystemBackground
-    $0.tintColor = .label
+    $0.tintColor = AppColor.buttonBackground
   }
 
   let tableView = UITableView(frame: .zero, style: .plain).then {
@@ -51,7 +48,7 @@ final class CurrencyView: BaseView {
     text: "검색 결과 없음",
     family: .medium,
     size: 16,
-    color: .systemGray,
+    color: AppColor.secondaryText,
     alignment: .center,
     lines: 0,
     lineBreak: .byWordWrapping
@@ -107,6 +104,7 @@ final class CurrencyView: BaseView {
           .marginHorizontal(Layout.hPadding)
           .height(Layout.emptyHeight)
       }
+    emptyContainer.backgroundColor = AppColor.background
     tableView.backgroundView = emptyContainer
     footerSpacerView.backgroundColor = .clear
     tableView.tableFooterView = footerSpacerView
