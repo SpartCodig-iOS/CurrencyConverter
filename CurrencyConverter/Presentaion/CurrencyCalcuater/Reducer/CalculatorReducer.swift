@@ -36,12 +36,12 @@ public struct CalculatorReducer {
     }
   }
 
-  public enum Action: ViewAction {
+  public enum Action: ViewAction, Equatable {
     case view(View)
     case inner(InnerAction)
   }
 
-  public enum View {
+  public enum View: Equatable {
     case onAppear
     case calculateButtonTapped
     case amountChanged(String)

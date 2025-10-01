@@ -29,6 +29,13 @@ extension ExchangeUseCaseImpl: InjectedKey {
     }
     return ExchangeUseCaseImpl(repository: repository)
   }
+
+  public static var testValue: ExchangeRateInterface {
+    let repository: ExchangeRateInterface = UnifiedDI.register(ExchangeRateInterface.self) {
+      MockExchangeRepositoryImpl()
+    }
+    return ExchangeUseCaseImpl(repository: repository)
+  }
 }
 
 public extension InjectedValues {

@@ -10,9 +10,11 @@ import Foundation
 @MainActor
 final class MockFavoriteCurrencyRepositoryImpl: FavoriteCurrencyInterface {
 
-  nonisolated public init() {}
+  var storage: Set<String>
 
-  private var storage: Set<String> = []
+  nonisolated public init(initial: Set<String> = []) {
+    self.storage = initial
+  }
 
   func fetchFavorites() async throws -> [String] {
     Array(storage).sorted()
@@ -25,5 +27,11 @@ final class MockFavoriteCurrencyRepositoryImpl: FavoriteCurrencyInterface {
       storage.insert(currencyCode)
     }
     return try await fetchFavorites()
+  }
+}
+
+extension MockFavoriteCurrencyRepositoryImpl {
+  static func sampleFavorites() -> MockFavoriteCurrencyRepositoryImpl {
+    MockFavoriteCurrencyRepositoryImpl(initial: ["USD", "KRW"])
   }
 }

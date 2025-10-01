@@ -18,7 +18,8 @@ public final class SwiftDataStack {
     do {
       container = try ModelContainer(
         for: FavoriteCurrencyEntity.self,
-        ExchangeRateCacheEntity.self
+        ExchangeRateCacheEntity.self,
+        LastViewedScreenEntity.self
       )
     } catch {
       fatalError("Failed to initialize SwiftData container: \(error)")

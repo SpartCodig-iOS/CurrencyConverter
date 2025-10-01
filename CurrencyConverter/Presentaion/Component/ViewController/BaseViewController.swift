@@ -112,9 +112,10 @@ open class BaseViewController<
   private func bindErrorHandling() {
     // TCA Store의 에러를 감지하고 처리
     viewStore.publisher
-      .compactMap { state -> String? in
+      .compactMap { [weak self] state -> String? in
         // Feature.State에 error 프로퍼티가 있다면 추출
         // 서브클래스에서 오버라이드하여 구체적인 에러 추출 로직 구현
+        guard let self else { return nil }
         return self.extractError(from: state)
       }
       .removeDuplicates()
