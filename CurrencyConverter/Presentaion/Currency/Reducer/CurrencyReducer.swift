@@ -20,15 +20,29 @@ public struct CurrencyReducer {
     var exchangeRateModel: ExchangeRates?  = nil
     var baseCurrencyCode: String = ""
     var filteredRates: [String: Double] = [:]
-    var displayedRates: [String: Double] = [:]
+    var displayedRates: [CurrencyRateItem] = []
     var alertMessage: String? = nil
     var searchText: String = ""
     var currentPage: Int = 1
     var itemsPerPage: Int = 20
     var isLoadingMore: Bool = false
+    var favoriteCodes: Set<String> = []
 
     public init() {
 
+    }
+
+    public static func == (lhs: State, rhs: State) -> Bool {
+      lhs.exchangeRateModel == rhs.exchangeRateModel &&
+      lhs.baseCurrencyCode == rhs.baseCurrencyCode &&
+      lhs.filteredRates == rhs.filteredRates &&
+      lhs.displayedRates == rhs.displayedRates &&
+      lhs.alertMessage == rhs.alertMessage &&
+      lhs.searchText == rhs.searchText &&
+      lhs.currentPage == rhs.currentPage &&
+      lhs.itemsPerPage == rhs.itemsPerPage &&
+      lhs.isLoadingMore == rhs.isLoadingMore &&
+      lhs.favoriteCodes == rhs.favoriteCodes
     }
   }
 
@@ -43,9 +57,11 @@ public struct CurrencyReducer {
   //MARK: - ViewAction
   
   public enum View {
+    case onAppear
     case clearAlert
     case searchTextChanged(String)
     case loadMoreData
+    case favoriteTapped(String)
   }
 
 
@@ -53,6 +69,8 @@ public struct CurrencyReducer {
   public enum AsyncAction: Equatable {
     case fetchExchangeRates
     case searchCurrency(String)
+    case fetchFavorites
+    case toggleFavorite(String)
 
   }
 
@@ -61,6 +79,8 @@ public struct CurrencyReducer {
     case onFetchExchangeRatesResponse(Result<ExchangeRates, DomainError>)
     case loadMoreCompleted(Int)
     case updateDisplayedRates
+    case onFavoritesUpdated(Set<String>)
+    case favoriteOperationFailed(DomainError)
   }
 
   //MARK: - NavigationAction
@@ -69,7 +89,7 @@ public struct CurrencyReducer {
   }
 
   @Injected(ExchangeUseCaseImpl.self) var exchangeUseCase
-//  @Inject var exchangeUseCase : ExchangeRateInterface?
+  @Injected(FavoriteCurrencyUseCaseImpl.self) var favoriteUseCase
 
   public var body: some Reducer<State, Action> {
     BindingReducer()
@@ -98,6 +118,12 @@ public struct CurrencyReducer {
     action: View
   ) -> Effect<Action> {
     switch action {
+      case .onAppear:
+        return .concatenate(
+          .run { await $0(.async(.fetchExchangeRates)) },
+            .run { await $0(.async(.fetchFavorites)) }
+        )
+
       case .clearAlert:
         state.alertMessage = nil
         return .none
@@ -141,14 +167,19 @@ public struct CurrencyReducer {
           try await Task.sleep(for: .milliseconds(500)) // 로딩 시뮬레이션
           await send(.inner(.loadMoreCompleted(currentPage + 1)))
         }
+
+      case .favoriteTapped(let code):
+        return .send(.async(.toggleFavorite(code)))
     }
   }
 
   private func updateDisplayedRates(state: inout State) {
-    let sortedRates = state.filteredRates.sorted { $0.key < $1.key }
-    let endIndex = min(state.currentPage * state.itemsPerPage, sortedRates.count)
-    let pagedRates = Array(sortedRates[0..<endIndex])
-    state.displayedRates = Dictionary(uniqueKeysWithValues: pagedRates)
+    let sortedPairs = state.filteredRates.sorted { $0.key < $1.key }
+    let allRates = sortedPairs.map { CurrencyRateItem(code: $0.key, rate: $0.value) }
+    let favorites = state.favoriteCodes
+    let ordered = allRates.partitioned { favorites.contains($0.code) }
+    let endIndex = min(state.currentPage * state.itemsPerPage, ordered.count)
+    state.displayedRates = Array(ordered.prefix(endIndex))
   }
 
   private func handleAsyncAction(
@@ -187,6 +218,34 @@ public struct CurrencyReducer {
               await send(.inner(.onFetchExchangeRatesResponse(.failure(.notFound))))
           }
         }
+
+      case .fetchFavorites:
+        return .run { send in
+          let favoriteResult = await Result {
+            try await favoriteUseCase.fetchFavorites()
+          }
+
+          switch favoriteResult {
+            case .success(let codes):
+              await send(.inner(.onFavoritesUpdated(Set(codes))))
+            case .failure(_):
+              await send(.inner(.favoriteOperationFailed(.unknown)))
+          }
+        }
+
+      case .toggleFavorite(let code):
+        return .run { send in
+          let favoriteResult = await Result {
+            try await favoriteUseCase.toggleFavorite(currencyCode: code)
+          }
+
+          switch favoriteResult {
+            case .success(let codes):
+              await send(.inner(.onFavoritesUpdated(Set(codes))))
+            case .failure(_):
+              await send(.inner(.favoriteOperationFailed(.unknown)))
+          }
+        }
     }
   }
 
@@ -209,7 +268,7 @@ public struct CurrencyReducer {
             state.exchangeRateModel = nil
             state.baseCurrencyCode = ""
             state.filteredRates = [:]
-            state.displayedRates = [:]
+            state.displayedRates = []
             state.alertMessage = "데이터를 불러올 수 없습니다 \(error.errorDescription ?? "Unknown Error")"
         }
         return .send(.inner(.updateDisplayedRates))
@@ -220,10 +279,15 @@ public struct CurrencyReducer {
         return .send(.inner(.updateDisplayedRates))
 
       case .updateDisplayedRates:
-        let sortedRates = state.filteredRates.sorted { $0.key < $1.key }
-        let endIndex = min(state.currentPage * state.itemsPerPage, sortedRates.count)
-        let pagedRates = Array(sortedRates[0..<endIndex])
-        state.displayedRates = Dictionary(uniqueKeysWithValues: pagedRates)
+        updateDisplayedRates(state: &state)
+        return .none
+
+      case .onFavoritesUpdated(let codes):
+        state.favoriteCodes = codes
+        return .send(.inner(.updateDisplayedRates))
+
+      case .favoriteOperationFailed(let error):
+        state.alertMessage = error.errorDescription
         return .none
     }
   }

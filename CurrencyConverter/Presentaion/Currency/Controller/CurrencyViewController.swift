@@ -35,11 +35,13 @@ final class CurrencyViewController: BaseViewController<CurrencyView, CurrencyRed
 
     // 화면 진입 시 환율 요청
     safeSend(.async(.fetchExchangeRates))
+    safeSend(.async(.fetchFavorites))
 
     rootView.refreshControl
       .publisher(for: .valueChanged)
       .sink { [weak self] in
         self?.safeSend(.async(.fetchExchangeRates))
+        self?.safeSend(.async(.fetchFavorites))
       }
       .store(in: &cancellables)
 
@@ -82,6 +84,12 @@ final class CurrencyViewController: BaseViewController<CurrencyView, CurrencyRed
       }
       .store(in: &cancellables)
 
+    optimizedPublisher(\.favoriteCodes)
+      .sink { [weak self] _ in
+        self?.rootView.reload()
+      }
+      .store(in: &cancellables)
+
     optimizedPublisher(\.isLoadingMore)
       .sink { [weak self] isLoading in
         if isLoading {
@@ -96,20 +104,21 @@ final class CurrencyViewController: BaseViewController<CurrencyView, CurrencyRed
   // MARK: - View Models
   private var products: [Product] {
     let displayedRates = viewStore.displayedRates
-    return Self.mapFilteredRatesToProducts(displayedRates)
+    let favorites = viewStore.favoriteCodes
+    return Self.mapRatesToProducts(displayedRates, favorites: favorites)
   }
 
-  private static func mapFilteredRatesToProducts(_ rates: [String: Double]) -> [Product] {
+  private static func mapRatesToProducts(_ rates: [CurrencyRateItem], favorites: Set<String>) -> [Product] {
     let locale = Locale(identifier: "ko_KR")
     return rates
-      .sorted { $0.key < $1.key }
-      .map { (code, rate) in
-        let name = locale.currencyDisplayName(for: code)
+      .map { item in
+        let name = locale.currencyDisplayName(for: item.code)
         return Product(
-          title: "\(code)",
+          title: item.code,
           subtitle: name,
-          price: rate.decimalString(rate),
-          rate: rate
+          price: item.rate.decimalString(item.rate),
+          rate: item.rate,
+          isFavorite: favorites.contains(item.code)
         )
       }
   }
@@ -123,7 +132,11 @@ extension CurrencyViewController: UITableViewDataSource {
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell: ProductCell = tableView.dequeueReusableCell(for: indexPath)
-    cell.configure(products[indexPath.row])
+    let product = products[indexPath.row]
+    cell.configure(product)
+    cell.onFavoriteTapped = { [weak self] in
+      self?.safeSend(.view(.favoriteTapped(product.title)))
+    }
     return cell
   }
 }

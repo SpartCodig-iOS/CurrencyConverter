@@ -68,7 +68,7 @@ final class CurrencyView: BaseView {
     static let headerBottomSpacing: CGFloat = 8
     static let emptyHeight: CGFloat = 100
     static let loadingBottomMargin: CGFloat = 20
-    static let topMargin: CGFloat = 30
+    static let topMargin: CGFloat = 10
   }
 
   // MARK: - Lifecycle

@@ -60,6 +60,24 @@ final class ProductCell: UITableViewCell, Reusable {
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
   }
 
+  private let favoriteButton = UIButton(type: .system).then {
+    $0.setContentHuggingPriority(.required, for: .horizontal)
+    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    $0.accessibilityLabel = "즐겨찾기"
+
+    if #available(iOS 15.0, *) {
+      var config = UIButton.Configuration.plain()
+      config.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 6)
+      config.baseForegroundColor = .systemYellow
+      $0.configuration = config
+    } else {
+      $0.tintColor = .systemYellow
+      $0.contentEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
+    }
+  }
+
+  var onFavoriteTapped: (() -> Void)?
+
   // MARK: Layout Const
   private enum Layout {
     static let paddingH: CGFloat = 12
@@ -74,6 +92,9 @@ final class ProductCell: UITableViewCell, Reusable {
     selectionStyle = .none
     setupViews()
     buildFlexTree()
+    favoriteButton.addAction(UIAction { [weak self] _ in
+      self?.onFavoriteTapped?()
+    }, for: .touchUpInside)
   }
   required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
@@ -95,6 +116,8 @@ final class ProductCell: UITableViewCell, Reusable {
           col.addItem(subtitleLabel).marginTop(4)
         }
         row.addItem(priceLabel).shrink(0).marginLeft(8)
+        row.addItem(favoriteButton)
+          .marginLeft(8)
       }
   }
 
@@ -103,6 +126,18 @@ final class ProductCell: UITableViewCell, Reusable {
     titleLabel.text = product.title
     subtitleLabel.text = product.subtitle
     priceLabel.text = product.price
+
+    let symbolName = product.isFavorite ? "star.fill" : "star"
+    let tint = product.isFavorite ? UIColor.systemYellow : UIColor.systemGray3
+    if #available(iOS 15.0, *) {
+      var updatedConfig = favoriteButton.configuration ?? .plain()
+      updatedConfig.image = UIImage(systemName: symbolName)
+      updatedConfig.baseForegroundColor = tint
+      favoriteButton.configuration = updatedConfig
+    } else {
+      favoriteButton.setImage(UIImage(systemName: symbolName), for: .normal)
+      favoriteButton.tintColor = tint
+    }
 
     // 가격 고정폭 확보 (intrinsic 기준)
     let targetWidth = ceil(priceLabel.intrinsicContentSize.width)
@@ -133,6 +168,8 @@ final class ProductCell: UITableViewCell, Reusable {
     subtitleLabel.text = nil
     priceLabel.text = nil
     priceLabel.flex.minWidth(0)
+    favoriteButton.setImage(nil, for: .normal)
+    onFavoriteTapped = nil
     contentView.flex.markDirty()
   }
 }
