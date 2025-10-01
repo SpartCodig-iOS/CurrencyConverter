@@ -17,12 +17,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     guard let windowScene = scene as? UIWindowScene else { return }
     let window = UIWindow(windowScene: windowScene)
 
-    let store = Store(initialState: CurrencyReducer.State()) {
-      CurrencyReducer()
+    let store = Store(initialState: RootReducer.State()) {
+      RootReducer()
         ._printChanges()
     }
 
-    window.rootViewController = CurrencyViewController(store: store)
+    let rootVC = RootViewController(store: store)
+    rootVC.navigationBar.prefersLargeTitles = false
+
+    window.rootViewController = rootVC
     window.makeKeyAndVisible()
     self.window = window
   }
