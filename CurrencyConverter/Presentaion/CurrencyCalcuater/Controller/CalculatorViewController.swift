@@ -21,7 +21,7 @@ final class CalculatorViewController: BaseViewController<CalculateView, Calculat
 
   override func configureUI() {
     super.configureUI()
-    view.backgroundColor = .systemBackground
+    view.backgroundColor = UIColor.appBackground
   }
 
   override func bindActions() {

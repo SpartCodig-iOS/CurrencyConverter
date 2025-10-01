@@ -24,7 +24,7 @@ final class ProductCell: UITableViewCell, Reusable {
     text: nil,
     family: .semiBold,
     size: 16,
-    color: .label,
+    color: UIColor.appPrimaryText,
     alignment: .left,
     lines: 1,
     lineBreak: .byTruncatingTail
@@ -37,7 +37,7 @@ final class ProductCell: UITableViewCell, Reusable {
     text: nil,
     family: .regular,
     size: 13,
-    color: .secondaryLabel,
+    color: UIColor.appSecondaryText,
     alignment: .left,
     lines: 1,
     lineBreak: .byTruncatingTail
@@ -50,7 +50,7 @@ final class ProductCell: UITableViewCell, Reusable {
     text: nil,
     family: .bold,
     size: 15,
-    color: .secondaryLabel,
+    color: UIColor.appPrimaryText,
     alignment: .right,
     lines: 1,
     lineBreak: .byClipping
@@ -62,7 +62,7 @@ final class ProductCell: UITableViewCell, Reusable {
 
   private let trendImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
-    $0.tintColor = .label
+    $0.tintColor = UIColor.appPrimaryText
     $0.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 12, weight: .bold)
     $0.setContentHuggingPriority(.required, for: .horizontal)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -76,10 +76,10 @@ final class ProductCell: UITableViewCell, Reusable {
     if #available(iOS 15.0, *) {
       var config = UIButton.Configuration.plain()
       config.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 6)
-      config.baseForegroundColor = .systemYellow
+      config.baseForegroundColor = UIColor.appFavoriteInactive
       $0.configuration = config
     } else {
-      $0.tintColor = .systemYellow
+      $0.tintColor = UIColor.appFavoriteInactive
       $0.contentEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
     }
   }
@@ -99,6 +99,7 @@ final class ProductCell: UITableViewCell, Reusable {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
+    backgroundColor = .clear
     setupViews()
     buildFlexTree()
     favoriteButton.addAction(UIAction { [weak self] _ in
@@ -109,7 +110,7 @@ final class ProductCell: UITableViewCell, Reusable {
 
   // MARK: Setup
   private func setupViews() {
-    contentView.backgroundColor = .systemBackground
+    contentView.backgroundColor = .clear
     contentView.addSubview(root)
   }
 
@@ -141,7 +142,7 @@ final class ProductCell: UITableViewCell, Reusable {
     priceLabel.text = product.price
 
     let symbolName = product.isFavorite ? "star.fill" : "star"
-    let tint = product.isFavorite ? UIColor.systemYellow : UIColor.systemGray3
+    let tint = product.isFavorite ? UIColor.appFavoriteActive : UIColor.appFavoriteInactive
     if #available(iOS 15.0, *) {
       var updatedConfig = favoriteButton.configuration ?? .plain()
       updatedConfig.image = UIImage(systemName: symbolName)
@@ -155,18 +156,17 @@ final class ProductCell: UITableViewCell, Reusable {
     switch product.trend {
       case .up:
         trendImageView.image = UIImage(systemName: "arrowtriangle.up.fill")?.withRenderingMode(.alwaysTemplate)
-        trendImageView.tintColor = .systemGreen
+        trendImageView.tintColor = UIColor.appTrendUp
         trendImageView.alpha = 1
       case .down:
         trendImageView.image = UIImage(systemName: "arrowtriangle.down.fill")?.withRenderingMode(.alwaysTemplate)
-        trendImageView.tintColor = .systemRed
+        trendImageView.tintColor = UIColor.appTrendDown
         trendImageView.alpha = 1
       case .none:
         trendImageView.image = nil
         trendImageView.alpha = 0
     }
 
-    // 가격 고정폭 확보 (intrinsic 기준)
     let targetWidth = ceil(priceLabel.intrinsicContentSize.width)
     let minWidth = max(targetWidth, Layout.priceWidthMin) + Layout.priceWidthPad
     priceLabel.flex.minWidth(minWidth)
@@ -198,6 +198,10 @@ final class ProductCell: UITableViewCell, Reusable {
     favoriteButton.setImage(nil, for: .normal)
     trendImageView.image = nil
     trendImageView.alpha = 0
+    if var config = favoriteButton.configuration {
+      config.baseForegroundColor = UIColor.appFavoriteInactive
+      favoriteButton.configuration = config
+    }
     onFavoriteTapped = nil
     contentView.flex.markDirty()
   }

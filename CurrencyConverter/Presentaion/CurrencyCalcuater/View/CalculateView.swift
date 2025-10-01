@@ -24,7 +24,7 @@ final class CalculateView: BaseView {
     text: "환율 계산기",
     family: .semiBold,
     size: 40,
-    color: .white,
+    color: .appPrimaryText,
     alignment: .left
   )
 
@@ -32,7 +32,7 @@ final class CalculateView: BaseView {
     text: "ALL",
     family: .extraBold,
     size: 25,
-    color: .secondaryLabel,
+    color: .appPrimaryText,
     alignment: .center
   )
 
@@ -40,24 +40,24 @@ final class CalculateView: BaseView {
     text: "나라",
     family: .regular,
     size: 14,
-    color: .gray60,
+    color: .appSecondaryText,
     alignment: .center
   )
 
    let amountTextField = UITextField().then {
     $0.borderStyle = .none
-    $0.backgroundColor = .secondarySystemBackground
+    $0.backgroundColor = .appCellBackground
     $0.layer.cornerRadius = 12
     $0.layer.borderWidth = 1
-    $0.layer.borderColor = UIColor.systemGray4.cgColor
-    $0.textColor = .label
+    $0.layer.borderColor = UIColor.appBorder.cgColor
+    $0.textColor = UIColor.appPrimaryText
     $0.font = .pretendardFont(family: .medium, size: 16)
+    $0.tintColor = UIColor.appButtonBackground
 
-    // placeholder 스타일
     $0.attributedPlaceholder = NSAttributedString(
       string: "금액을 입력하세요",
       attributes: [
-        .foregroundColor: UIColor.systemGray2,
+        .foregroundColor: UIColor.appSecondaryText,
         .font: UIFont.pretendardFont(family: .medium, size: 16)
       ]
     )
@@ -75,11 +75,11 @@ final class CalculateView: BaseView {
 
   let calculateButton = UIButton(type: .system).then {
       $0.setTitle("환율 계산", for: .normal)
-      $0.setTitleColor(.white, for: .normal)
+      $0.setTitleColor(UIColor.appButtonTitle, for: .normal)
       $0.titleLabel?.font = .pretendardFont(family: .semiBold, size: 17)
-      $0.backgroundColor = .systemBlue
+      $0.backgroundColor = .appButtonBackground
       $0.clipsToBounds = true
-      $0.setTitleColor(.white, for: .disabled)
+      $0.setTitleColor(UIColor.appButtonTitle.withAlphaComponent(0.6), for: .disabled)
     }
 
 
@@ -87,7 +87,7 @@ final class CalculateView: BaseView {
     text: "계산 결과가 여기에 표시됩니다",
     family: .semiBold,
     size: 20,
-    color: .secondaryLabel,
+    color: .appSecondaryText,
     alignment: .center
   )
 
@@ -98,59 +98,74 @@ final class CalculateView: BaseView {
   }
 
   override func defineLayout() {
-    rootView.flex.define { flex in
-      flex.addItem(titleLabel)
-        .marginTop(30)
-        .marginBottom(20)
-        .alignSelf(.start)
+     rootView.flex
+       .paddingHorizontal(20)
+       .define { flex in
+         flex.addItem(titleLabel)
+           .marginTop(0)
+           .marginBottom(20)
+           .alignSelf(.start)
 
-      flex.addItem(currencyCodeLabel)
-        .marginTop(40)
-        .marginBottom(10)
+         flex.addItem(currencyCodeLabel)
+           .marginTop(40)
+           .marginBottom(10)
 
-      flex.addItem(currencyCountryName)
-        .marginBottom(30)
+         flex.addItem(currencyCountryName)
+           .marginBottom(30)
 
-      flex.addItem(amountTextField)
-        .height(40)
-        .marginBottom(30)
+         flex.addItem(amountTextField)
+           .height(44)
+           .marginBottom(20)
+           .width(100%)
 
-      flex.addItem(calculateButton)
-        .height(40)
-        .marginBottom(30)
+         flex.addItem(calculateButton)
+           .height(48)
+           .marginBottom(30)
+           .width(100%)
 
-      flex.addItem(calculateResultDescriptionLabel)
+         flex.addItem(calculateResultDescriptionLabel)
+           .marginBottom(20)
 
 
-    }
-  }
+         flex.addItem().height(12)
+       }
+   }
 
   override func setAttributes() {
      backgroundColor = .systemBackground
      rootView.backgroundColor = .clear
+    scrollView.showsHorizontalScrollIndicator = false
+    scrollView.showsVerticalScrollIndicator = false
    }
 
   override func layoutSubviews() {
-    super.layoutSubviews()
-    scrollView.frame = bounds
+      super.layoutSubviews()
 
-    let safeInsets = pin.safeArea
-    let contentWidth = max(scrollView.bounds.width - (safeInsets.left + safeInsets.right), 0)
+      let isLandscape = bounds.width > bounds.height
 
-    rootView.pin
-      .top(safeInsets.top)
-      .left(safeInsets.left)
-      .width(contentWidth)
+      scrollView.isScrollEnabled = isLandscape
+      scrollView.pin.all(pin.safeArea)
+      titleLabel.flex.marginTop(isLandscape ? 0 : 30)
 
-    rootView.flex.marginHorizontal(20)
-    rootView.flex.layout(mode: .adjustHeight)
+      rootView.pin
+        .top()
+        .horizontally(20)
 
-    let contentHeight = rootView.frame.height + safeInsets.top + safeInsets.bottom
-    let minHeight = scrollView.bounds.height
-    scrollView.contentSize = CGSize(width: scrollView.bounds.width, height: max(contentHeight, minHeight))
-    scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: safeInsets.bottom, right: 0)
-    scrollView.verticalScrollIndicatorInsets = UIEdgeInsets(top: safeInsets.top, left: 0, bottom: safeInsets.bottom, right: 0)
-    calculateButton.layer.cornerRadius = 10
+      rootView.flex.layout(mode: .adjustHeight)
+
+      let safeBottom = max(safeAreaInsets.bottom, window?.safeAreaInsets.bottom ?? 0)
+      let extraBottom: CGFloat = isLandscape ? 28 : 20
+
+      scrollView.contentInset.bottom = safeBottom + extraBottom
+
+      let contentH = rootView.frame.maxY + scrollView.contentInset.bottom
+      scrollView.contentSize = CGSize(
+        width: scrollView.bounds.width,
+        height: max(contentH, scrollView.bounds.height + 1)
+      )
+
+      calculateButton.layer.cornerRadius = 12
+      calculateButton.layer.masksToBounds = true
   }
 
   func textFieldDidEndEditing(_ textField: UITextField) {

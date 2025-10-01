@@ -24,7 +24,7 @@ final class CurrencyViewController: BaseViewController<CurrencyView, CurrencyRed
   // MARK: - Lifecycle Hooks
   override func configureUI() {
     super.configureUI()
-    self.view.backgroundColor = .systemBackground
+    self.view.backgroundColor = UIColor.appBackground
     rootView.tableView.dataSource = self
     rootView.tableView.delegate = self
     rootView.searchBar.delegate = self

@@ -84,7 +84,7 @@ open class BaseViewController<
 
   /// 뷰의 기본 설정 (배경색, 기본 속성 등)
   open func setupView() {
-    view.backgroundColor = .basicBlack
+    view.backgroundColor = UIColor.appBackground
   }
 
   /// UI 구성 등 추가 설정
@@ -200,4 +200,3 @@ open class BaseViewController<
     #endif
   }
 }
-

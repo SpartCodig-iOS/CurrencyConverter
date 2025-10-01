@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 // MARK: - Model
 struct Product {
   let title: String
