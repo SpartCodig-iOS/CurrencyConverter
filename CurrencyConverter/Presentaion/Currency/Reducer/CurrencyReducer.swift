@@ -23,7 +23,8 @@ public struct CurrencyReducer {
     var alertMessage: String? = nil
     var searchText: String = ""
     var currentPage: Int = 1
-    var itemsPerPage: Int = 10
+    var itemsPerPage: Int = 20
+    var isLoadingMore: Bool = false
 
     public init() {
 
@@ -36,7 +37,6 @@ public struct CurrencyReducer {
     case async(AsyncAction)
     case inner(InnerAction)
     case navigation(NavigationAction)
-
   }
 
   //MARK: - ViewAction
@@ -58,12 +58,13 @@ public struct CurrencyReducer {
   //MARK: - 앱내에서 사용하는 액션
   public enum InnerAction: Equatable {
     case onFetchExchangeRatesResponse(Result<ExchangeRates, DomainError>)
+    case loadMoreCompleted(Int)
+    case updateDisplayedRates
   }
 
   //MARK: - NavigationAction
   public enum NavigationAction: Equatable {
-
-
+    case navigateToCalculator(currencyCode: String)
   }
 
   @Injected(ExchangeUseCaseImpl.self) var exchangeUseCase
@@ -125,17 +126,20 @@ public struct CurrencyReducer {
           )
         }
 
-        // 페이징된 데이터 계산
-        updateDisplayedRates(state: &state)
-        return .none
+        return .send(.inner(.updateDisplayedRates))
 
       case .loadMoreData:
-        guard state.displayedRates.count < state.filteredRates.count else {
-          return .none // 더 이상 로드할 데이터 없음
+        guard state.displayedRates.count < state.filteredRates.count,
+              !state.isLoadingMore else {
+          return .none // 더 이상 로드할 데이터 없거나 이미 로딩 중
         }
-        state.currentPage += 1
-        updateDisplayedRates(state: &state)
-        return .none
+
+        state.isLoadingMore = true
+
+        return .run { [currentPage = state.currentPage] send in
+          try await Task.sleep(for: .milliseconds(500)) // 로딩 시뮬레이션
+          await send(.inner(.loadMoreCompleted(currentPage + 1)))
+        }
     }
   }
 
@@ -202,8 +206,21 @@ public struct CurrencyReducer {
           case .failure(let error):
             state.exchangeRateModel = nil
             state.filteredRates = [:]
+            state.displayedRates = [:]
             state.alertMessage = "데이터를 불러올 수 없습니다 \(error.errorDescription ?? "Unknown Error")"
         }
+        return .send(.inner(.updateDisplayedRates))
+
+      case .loadMoreCompleted(let newPage):
+        state.currentPage = newPage
+        state.isLoadingMore = false
+        return .send(.inner(.updateDisplayedRates))
+
+      case .updateDisplayedRates:
+        let sortedRates = state.filteredRates.sorted { $0.key < $1.key }
+        let endIndex = min(state.currentPage * state.itemsPerPage, sortedRates.count)
+        let pagedRates = Array(sortedRates[0..<endIndex])
+        state.displayedRates = Dictionary(uniqueKeysWithValues: pagedRates)
         return .none
     }
   }
@@ -212,8 +229,11 @@ public struct CurrencyReducer {
     state: inout State,
     action: NavigationAction
   ) -> Effect<Action> {
-    return .none
+    switch action {
+    case .navigateToCalculator:
+      // RootReducer에서 처리
+      return .none
+    }
   }
-
 }
 

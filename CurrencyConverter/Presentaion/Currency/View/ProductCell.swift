@@ -117,6 +117,7 @@ final class ProductCell: UITableViewCell, Reusable {
   override func layoutSubviews() {
     super.layoutSubviews()
     root.pin.all()
+    root.flex.marginHorizontal(10)
     root.flex.layout(mode: .adjustHeight)
   }
 

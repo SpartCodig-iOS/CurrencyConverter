@@ -75,12 +75,28 @@ final class CurrencyViewController: BaseViewController<CurrencyView, CurrencyRed
         self.rootView.updateEmptyState(isEmpty: filteredRates.isEmpty && !viewStore.searchText.isEmpty)
       }
       .store(in: &cancellables)
+
+    optimizedPublisher(\.displayedRates)
+      .sink { [weak self] _ in
+        self?.rootView.reload()
+      }
+      .store(in: &cancellables)
+
+    optimizedPublisher(\.isLoadingMore)
+      .sink { [weak self] isLoading in
+        if isLoading {
+          self?.rootView.showLoadingIndicator()
+        } else {
+          self?.rootView.hideLoadingIndicator()
+        }
+      }
+      .store(in: &cancellables)
   }
 
   // MARK: - View Models
   private var products: [Product] {
-    let filteredRates = viewStore.filteredRates
-    return Self.mapFilteredRatesToProducts(filteredRates)
+    let displayedRates = viewStore.displayedRates
+    return Self.mapFilteredRatesToProducts(displayedRates)
   }
 
   private static func mapFilteredRatesToProducts(_ rates: [String: Double]) -> [Product] {
@@ -115,7 +131,22 @@ extension CurrencyViewController: UITableViewDataSource {
 extension CurrencyViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
-    // safeSend(.navigation(...))
+    let selectedProduct = products[indexPath.row]
+    safeSend(.navigation(.navigateToCalculator(currencyCode: selectedProduct.title)))
+  }
+
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    let offsetY = scrollView.contentOffset.y
+    let contentHeight = scrollView.contentSize.height
+    let frameHeight = scrollView.frame.height
+
+    // RefreshControl이 활성화된 상태가 아닐 때만 무한 스크롤 동작
+    guard !rootView.refreshControl.isRefreshing else { return }
+
+    // 하단 40pt 이내로 스크롤 시 더 로드
+    if offsetY > contentHeight - frameHeight - 40 {
+      safeSend(.view(.loadMoreData))
+    }
   }
 }
 
