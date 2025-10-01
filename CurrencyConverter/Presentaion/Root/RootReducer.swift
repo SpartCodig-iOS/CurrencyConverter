@@ -38,8 +38,19 @@ public struct RootReducer {
 
     Reduce { state, action in
       switch action {
-        case .currency(.navigation(.navigateToCalculator(let currencyCode))):
-          state.path.append(.calculator(CalculatorReducer.State(currencyCode: currencyCode)))
+        case .currency(.navigation(.navigateToCalculator(let currencyCode, let currencyRate))):
+          let base = state.currency.baseCurrencyCode.isEmpty
+          ? (state.currency.exchangeRateModel?.base.rawValue ?? "USD")
+          : state.currency.baseCurrencyCode
+          state.path.append(
+            .calculator(
+              CalculatorReducer.State(
+                currencyCode: currencyCode,
+                exchangeRate: currencyRate,
+                baseCurrencyCode: base
+              )
+            )
+          )
           return .none
 
         case .currency:
