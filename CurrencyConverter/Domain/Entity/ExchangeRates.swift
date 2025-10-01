@@ -14,7 +14,7 @@ public struct ExchangeRates: Sendable, Equatable {
   public let provider: URL?
   public let documentation: URL?
   public let termsOfUse: URL?
-  public let rates: [CurrencyCode: Double]
+  public var rates: [CurrencyCode: Double]
 
   public init(
     base: CurrencyCode,

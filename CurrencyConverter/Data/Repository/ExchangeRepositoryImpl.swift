@@ -11,7 +11,7 @@ import Moya
 import WeaveDI
 
 public class ExchangeRepositoryImpl: ExchangeRateInterface {
-   private let provider = MoyaProvider<ExchangeRateService>(plugins: [MoyaLoggingPlugin()])
+  private let provider = MoyaProvider<ExchangeRateService>(plugins: [MoyaLoggingPlugin()])
 
   nonisolated public init() {
 
@@ -22,3 +22,4 @@ public class ExchangeRepositoryImpl: ExchangeRateInterface {
     return dtos.toDomain()
   }
 }
+

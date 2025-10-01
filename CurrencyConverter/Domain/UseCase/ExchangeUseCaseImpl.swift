@@ -38,15 +38,6 @@ public extension InjectedValues {
   }
 }
 
-//extension ExchangeUseCaseImpl: DependencyKey {
-//   static public var liveValue: ExchangeRateInterface {
-//    let repository: ExchangeRateInterface = UnifiedDI.register(ExchangeRateInterface.self) {
-//      ExchangeRepositoryImpl()
-//    }
-//    return ExchangeUseCaseImpl(repository: repository)
-//  }
-//}
-
 extension RegisterModule {
   var exchangeUseCaseModule: @Sendable () -> Module {
     makeUseCaseWithRepository(
