@@ -100,8 +100,14 @@ final class ProductCell: UITableViewCell, Reusable {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
     backgroundColor = .clear
+
+    preservesSuperviewLayoutMargins = false
+    contentView.preservesSuperviewLayoutMargins = false
+     contentView.layoutMargins = .zero
+
     setupViews()
     buildFlexTree()
+
     favoriteButton.addAction(UIAction { [weak self] _ in
       self?.onFavoriteTapped?()
     }, for: .touchUpInside)
@@ -126,12 +132,9 @@ final class ProductCell: UITableViewCell, Reusable {
           col.addItem(subtitleLabel).marginTop(4)
         }
         row.addItem(trendImageView)
-          .width(Layout.trendWidth)
-          .height(Layout.trendWidth)
-          .marginRight(4)
+          .width(Layout.trendWidth).height(Layout.trendWidth).marginRight(4)
         row.addItem(priceLabel).shrink(0).marginLeft(4)
-        row.addItem(favoriteButton)
-          .marginLeft(8)
+        row.addItem(favoriteButton).marginLeft(8)
       }
   }
 
@@ -179,13 +182,13 @@ final class ProductCell: UITableViewCell, Reusable {
   override func layoutSubviews() {
     super.layoutSubviews()
     root.pin.all()
-    root.flex.marginHorizontal(10)
+    root.flex.layout()
+    root.pin.horizontally(20)
     root.flex.layout(mode: .adjustHeight)
   }
 
   override func sizeThatFits(_ size: CGSize) -> CGSize {
     root.pin.width(size.width)
-    root.flex.layout(mode: .adjustHeight)
     return root.frame.size
   }
 
