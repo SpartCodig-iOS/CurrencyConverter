@@ -15,7 +15,10 @@ extension WeaveDI.Container {
   static func registerRepositories() async {
     let repositories = [
       helper.exchangeRepositoryModule(),
-      // 추가 Repository들...
+      helper.favoriteCurrencyRepositoryModule(),
+      helper.exchangeRateCacheRepositoryModule(),
+      helper.lastViewedScreenRepositoryModule(),
+
     ]
     
     await repositories.asyncForEach { module in
@@ -28,7 +31,9 @@ extension WeaveDI.Container {
     
     let useCases = [
       helper.exchangeUseCaseModule(),
-      // 추가 UseCase들...
+      helper.favoriteCurrencyUseCaseModule(),
+      helper.exchangeRateCacheUseCaseModule(),
+      helper.lastViewedScreenUseCaseModule(),
     ]
     
     await useCases.asyncForEach { module in

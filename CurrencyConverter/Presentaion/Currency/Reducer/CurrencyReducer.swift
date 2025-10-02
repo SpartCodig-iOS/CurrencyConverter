@@ -12,26 +12,73 @@ import WeaveDI
 @MainActor
 @Reducer
 public struct CurrencyReducer {
-  public init() {}
+  private let overrideExchangeUseCase: ExchangeRateInterface?
+  private let overrideFavoriteUseCase: FavoriteCurrencyInterface?
+  private let overrideCacheUseCase: ExchangeRateCacheInterface?
+
+  @Injected(ExchangeUseCaseImpl.self) private var injectedExchangeUseCase
+  @Injected(FavoriteCurrencyUseCaseImpl.self) private var injectedFavoriteUseCase
+  @Injected(ExchangeRateCacheUseCaseImpl.self) private var injectedCacheUseCase
+
+  private var resolvedExchangeUseCase: ExchangeRateInterface {
+    overrideExchangeUseCase ?? injectedExchangeUseCase
+  }
+
+  private var resolvedFavoriteUseCase: FavoriteCurrencyInterface {
+    overrideFavoriteUseCase ?? injectedFavoriteUseCase
+  }
+
+  private var resolvedCacheUseCase: ExchangeRateCacheInterface {
+    overrideCacheUseCase ?? injectedCacheUseCase
+  }
+
+  public init(
+    exchangeUseCase: ExchangeRateInterface? = nil,
+    favoriteUseCase: FavoriteCurrencyInterface? = nil,
+    cacheUseCase: ExchangeRateCacheInterface? = nil
+  ) {
+    self.overrideExchangeUseCase = exchangeUseCase
+    self.overrideFavoriteUseCase = favoriteUseCase
+    self.overrideCacheUseCase = cacheUseCase
+  }
 
   @ObservableState
   public struct State: Equatable {
 
     var exchangeRateModel: ExchangeRates?  = nil
+    var baseCurrencyCode: String = ""
     var filteredRates: [String: Double] = [:]
-    var displayedRates: [String: Double] = [:]
+    var displayedRates: [CurrencyRateItem] = []
     var alertMessage: String? = nil
     var searchText: String = ""
     var currentPage: Int = 1
     var itemsPerPage: Int = 20
     var isLoadingMore: Bool = false
+    var favoriteCodes: Set<String> = []
+    var rateTrends: [String: RateTrend] = [:]
+    var previousRates: [String: Double] = [:]
+    var lastCachedAt: Date? = nil
+    var pendingRestoration: LastViewedScreen? = nil
 
-    public init() {
-
+    public static func == (lhs: State, rhs: State) -> Bool {
+      lhs.exchangeRateModel == rhs.exchangeRateModel &&
+      lhs.baseCurrencyCode == rhs.baseCurrencyCode &&
+      lhs.filteredRates == rhs.filteredRates &&
+      lhs.displayedRates == rhs.displayedRates &&
+      lhs.alertMessage == rhs.alertMessage &&
+      lhs.searchText == rhs.searchText &&
+      lhs.currentPage == rhs.currentPage &&
+      lhs.itemsPerPage == rhs.itemsPerPage &&
+      lhs.isLoadingMore == rhs.isLoadingMore &&
+      lhs.favoriteCodes == rhs.favoriteCodes &&
+      lhs.rateTrends == rhs.rateTrends &&
+      lhs.previousRates == rhs.previousRates &&
+      lhs.lastCachedAt == rhs.lastCachedAt &&
+      lhs.pendingRestoration == rhs.pendingRestoration
     }
   }
 
-  public enum Action: ViewAction, BindableAction {
+  public enum Action: ViewAction, BindableAction, Equatable {
     case binding(BindingAction<State>)
     case view(View)
     case async(AsyncAction)
@@ -41,10 +88,12 @@ public struct CurrencyReducer {
 
   //MARK: - ViewAction
   
-  public enum View {
+  public enum View: Equatable {
+    case onAppear
     case clearAlert
     case searchTextChanged(String)
     case loadMoreData
+    case favoriteTapped(String)
   }
 
 
@@ -52,6 +101,10 @@ public struct CurrencyReducer {
   public enum AsyncAction: Equatable {
     case fetchExchangeRates
     case searchCurrency(String)
+    case fetchFavorites
+    case toggleFavorite(String)
+    case loadCachedSnapshot
+    case saveSnapshot(ExchangeRateSnapshot)
 
   }
 
@@ -60,15 +113,17 @@ public struct CurrencyReducer {
     case onFetchExchangeRatesResponse(Result<ExchangeRates, DomainError>)
     case loadMoreCompleted(Int)
     case updateDisplayedRates
+    case onFavoritesUpdated(Set<String>)
+    case favoriteOperationFailed(DomainError)
+    case onCachedSnapshotLoaded(ExchangeRateSnapshot?)
+    case cacheOperationFailed(DomainError)
+    case setPendingRestoration(LastViewedScreen?)
   }
 
   //MARK: - NavigationAction
   public enum NavigationAction: Equatable {
-    case navigateToCalculator(currencyCode: String)
+    case navigateToCalculator(currencyCode: String, currencyRate: Double)
   }
-
-  @Injected(ExchangeUseCaseImpl.self) var exchangeUseCase
-//  @Inject var exchangeUseCase : ExchangeRateInterface?
 
   public var body: some Reducer<State, Action> {
     BindingReducer()
@@ -97,6 +152,15 @@ public struct CurrencyReducer {
     action: View
   ) -> Effect<Action> {
     switch action {
+      case .onAppear:
+        return .concatenate(
+          .send(.async(.loadCachedSnapshot)),
+          .merge(
+            .send(.async(.fetchExchangeRates)),
+            .send(.async(.fetchFavorites))
+          )
+        )
+
       case .clearAlert:
         state.alertMessage = nil
         return .none
@@ -140,14 +204,25 @@ public struct CurrencyReducer {
           try await Task.sleep(for: .milliseconds(500)) // 로딩 시뮬레이션
           await send(.inner(.loadMoreCompleted(currentPage + 1)))
         }
+
+      case .favoriteTapped(let code):
+        return .send(.async(.toggleFavorite(code)))
     }
   }
 
   private func updateDisplayedRates(state: inout State) {
-    let sortedRates = state.filteredRates.sorted { $0.key < $1.key }
-    let endIndex = min(state.currentPage * state.itemsPerPage, sortedRates.count)
-    let pagedRates = Array(sortedRates[0..<endIndex])
-    state.displayedRates = Dictionary(uniqueKeysWithValues: pagedRates)
+    let sortedPairs = state.filteredRates.sorted { $0.key < $1.key }
+    let allRates = sortedPairs.map { pair in
+      CurrencyRateItem(
+        code: pair.key,
+        rate: pair.value,
+        trend: state.rateTrends[pair.key] ?? .none
+      )
+    }
+    let favorites = state.favoriteCodes
+    let ordered = allRates.partitioned { favorites.contains($0.code) }
+    let endIndex = min(state.currentPage * state.itemsPerPage, ordered.count)
+    state.displayedRates = Array(ordered.prefix(endIndex))
   }
 
   private func handleAsyncAction(
@@ -158,7 +233,7 @@ public struct CurrencyReducer {
       case .fetchExchangeRates:
         return .run { send in
           let exchangeRateResult = await Result {
-            try await exchangeUseCase.getExchangeRates(currency: "USD")
+            try await resolvedExchangeUseCase.getExchangeRates(currency: "USD")
           }
 
           switch exchangeRateResult {
@@ -174,7 +249,7 @@ public struct CurrencyReducer {
       case .searchCurrency(let currency):
         return .run { send in
           let exchangeRateResult = await Result {
-            try await exchangeUseCase.getExchangeRates(currency: currency)
+            try await resolvedExchangeUseCase.getExchangeRates(currency: currency)
           }
 
           switch exchangeRateResult {
@@ -184,6 +259,59 @@ public struct CurrencyReducer {
               }
             case .failure(_):
               await send(.inner(.onFetchExchangeRatesResponse(.failure(.notFound))))
+          }
+        }
+
+      case .fetchFavorites:
+        return .run { send in
+          let favoriteResult = await Result {
+            try await resolvedFavoriteUseCase.fetchFavorites()
+          }
+
+          switch favoriteResult {
+            case .success(let codes):
+              await send(.inner(.onFavoritesUpdated(Set(codes))))
+            case .failure(_):
+              await send(.inner(.favoriteOperationFailed(.unknown)))
+          }
+        }
+
+      case .toggleFavorite(let code):
+        return .run { send in
+          let favoriteResult = await Result {
+            try await resolvedFavoriteUseCase.toggleFavorite(currencyCode: code)
+          }
+
+          switch favoriteResult {
+            case .success(let codes):
+              await send(.inner(.onFavoritesUpdated(Set(codes))))
+            case .failure(_):
+              await send(.inner(.favoriteOperationFailed(.unknown)))
+          }
+        }
+
+      case .loadCachedSnapshot:
+        return .run { send in
+          let cacheResult = await Result {
+            try await resolvedCacheUseCase.loadSnapshot()
+          }
+
+          switch cacheResult {
+            case .success(let snapshot):
+              await send(.inner(.onCachedSnapshotLoaded(snapshot)))
+            case .failure(_):
+              await send(.inner(.cacheOperationFailed(.unknown)))
+          }
+        }
+
+      case .saveSnapshot(let snapshot):
+        return .run { send in
+          let result = await Result {
+            try await resolvedCacheUseCase.saveSnapshot(snapshot)
+          }
+
+          if case .failure(_) = result {
+            await send(.inner(.cacheOperationFailed(.unknown)))
           }
         }
     }
@@ -198,18 +326,40 @@ public struct CurrencyReducer {
         switch result {
           case .success(let exchangeRateData):
             state.exchangeRateModel = exchangeRateData
-            // 초기 로드 시 전체 리스트 표시
-            state.filteredRates = Dictionary(uniqueKeysWithValues:
-              exchangeRateData.rates.map { ($0.key.rawValue, $0.value) }
-            )
+            state.baseCurrencyCode = exchangeRateData.base.rawValue
+            let newRates = exchangeRateData.rates.reduce(into: [String: Double]()) { dict, pair in
+              dict[pair.key.rawValue] = pair.value
+            }
+            state.filteredRates = newRates
+            state.rateTrends = computeTrends(newRates: newRates, previousRates: state.previousRates)
+            state.previousRates = newRates
+            state.lastCachedAt = exchangeRateData.lastUpdatedAt
+
+          let snapshot = ExchangeRateSnapshot(
+            base: exchangeRateData.base.rawValue,
+            lastUpdatedAt: exchangeRateData.lastUpdatedAt,
+            rates: newRates
+          )
+
+          let restoration = restorationEffect(state: &state, rates: newRates)
+
+          return .merge(
+            .send(.inner(.updateDisplayedRates)),
+            .send(.async(.saveSnapshot(snapshot))),
+            restoration
+          )
 
           case .failure(let error):
             state.exchangeRateModel = nil
+            state.baseCurrencyCode = ""
             state.filteredRates = [:]
-            state.displayedRates = [:]
+            state.displayedRates = []
+            state.rateTrends = [:]
+            state.previousRates = [:]
+            state.lastCachedAt = nil
             state.alertMessage = "데이터를 불러올 수 없습니다 \(error.errorDescription ?? "Unknown Error")"
+            return .send(.inner(.updateDisplayedRates))
         }
-        return .send(.inner(.updateDisplayedRates))
 
       case .loadMoreCompleted(let newPage):
         state.currentPage = newPage
@@ -217,10 +367,47 @@ public struct CurrencyReducer {
         return .send(.inner(.updateDisplayedRates))
 
       case .updateDisplayedRates:
-        let sortedRates = state.filteredRates.sorted { $0.key < $1.key }
-        let endIndex = min(state.currentPage * state.itemsPerPage, sortedRates.count)
-        let pagedRates = Array(sortedRates[0..<endIndex])
-        state.displayedRates = Dictionary(uniqueKeysWithValues: pagedRates)
+        updateDisplayedRates(state: &state)
+        return .none
+
+      case .onFavoritesUpdated(let codes):
+        state.favoriteCodes = codes
+        return .send(.inner(.updateDisplayedRates))
+
+      case .favoriteOperationFailed(let error):
+        state.alertMessage = error.errorDescription
+        return .none
+
+      case .onCachedSnapshotLoaded(let snapshot):
+        if let snapshot {
+          state.previousRates = snapshot.rates
+          state.lastCachedAt = snapshot.lastUpdatedAt
+          if state.filteredRates.isEmpty {
+            state.filteredRates = snapshot.rates
+            if state.baseCurrencyCode.isEmpty {
+              state.baseCurrencyCode = snapshot.base
+            }
+          }
+          state.rateTrends = snapshot.rates.keys.reduce(into: [:]) { partialResult, code in
+            partialResult[code] = RateTrend.none
+          }
+        } else {
+          state.previousRates = [:]
+          state.lastCachedAt = nil
+          state.rateTrends = [:]
+        }
+        let restoration = restorationEffect(state: &state, rates: state.filteredRates)
+        return .merge(
+          .send(.inner(.updateDisplayedRates)),
+          restoration
+        )
+
+      case .cacheOperationFailed(let error):
+        state.alertMessage = error.errorDescription
+        return .none
+
+      case .setPendingRestoration(let restoration):
+        state.pendingRestoration = restoration
         return .none
     }
   }
@@ -235,5 +422,45 @@ public struct CurrencyReducer {
       return .none
     }
   }
-}
 
+  private func restorationEffect(
+    state: inout State,
+    rates: [String: Double]
+  ) -> Effect<Action> {
+    guard let restoration = state.pendingRestoration else {
+      return .none
+    }
+
+    switch restoration.type {
+      case .list:
+        state.pendingRestoration = nil
+        return .none
+
+      case .calculator:
+        guard let code = restoration.currencyCode,
+              let rate = rates[code] else {
+          return .none
+        }
+        state.pendingRestoration = nil
+        return .send(
+          .navigation(
+            .navigateToCalculator(
+              currencyCode: code,
+              currencyRate: rate
+            )
+          )
+        )
+    }
+  }
+
+  private func computeTrends(
+    newRates: [String: Double],
+    previousRates: [String: Double]
+  ) -> [String: RateTrend] {
+    newRates.reduce(into: [String: RateTrend]()) { result, entry in
+      let previous = previousRates[entry.key] ?? entry.value
+      let diff = entry.value - previous
+      result[entry.key] = RateTrend(difference: diff)
+    }
+  }
+}
