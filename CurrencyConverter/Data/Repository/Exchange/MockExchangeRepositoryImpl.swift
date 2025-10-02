@@ -25,3 +25,56 @@ final class MockExchangeRepositoryImpl: ExchangeRateInterface {
     }
   }
 }
+
+// MARK: - Sample Data Helpers
+
+extension MockExchangeRepositoryImpl {
+  static func sampleRepository(
+    base: String = "USD",
+    timestamp: Date = Date(timeIntervalSince1970: 1_704_000_000),
+    nextUpdateInterval: TimeInterval = 3600,
+    rates: [String: Double] = [
+      "KRW": 1_350.25,
+      "JPY": 148.56,
+      "EUR": 0.91
+    ]
+  ) -> MockExchangeRepositoryImpl {
+    MockExchangeRepositoryImpl()
+      .preloading(
+        currency: base,
+        exchangeRates: ExchangeRates.sample(
+          base: base,
+          rates: rates,
+          timestamp: timestamp,
+          nextUpdateInterval: nextUpdateInterval
+        )
+      )
+  }
+
+  @discardableResult
+  func preloading(
+    currency: String,
+    exchangeRates: ExchangeRates
+  ) -> MockExchangeRepositoryImpl {
+    responses[currency] = .success(exchangeRates)
+    return self
+  }
+
+  @discardableResult
+  func preloading(
+    currency: String,
+    rates: [String: Double],
+    timestamp: Date = Date(timeIntervalSince1970: 1_704_000_000),
+    nextUpdateInterval: TimeInterval = 3600
+  ) -> MockExchangeRepositoryImpl {
+    preloading(
+      currency: currency,
+      exchangeRates: ExchangeRates.sample(
+        base: currency,
+        rates: rates,
+        timestamp: timestamp,
+        nextUpdateInterval: nextUpdateInterval
+      )
+    )
+  }
+}

@@ -37,10 +37,7 @@ extension LastViewedScreenUseCaseImpl: InjectedKey {
   }
 
   public static var testValue: LastViewedScreenInterface {
-    let repository: LastViewedScreenInterface = UnifiedDI.register(LastViewedScreenInterface.self) {
-      MockLastViewedScreenRepositoryImpl()
-    }
-    return LastViewedScreenUseCaseImpl(repository: repository)
+    LastViewedScreenUseCaseImpl(repository: MockLastViewedScreenRepositoryImpl())
   }
 }
 

@@ -33,10 +33,7 @@ extension FavoriteCurrencyUseCaseImpl: InjectedKey {
   }
 
   public static var testValue: FavoriteCurrencyInterface {
-    let repository: FavoriteCurrencyInterface = UnifiedDI.register(FavoriteCurrencyInterface.self) {
-      MockFavoriteCurrencyRepositoryImpl()
-    }
-    return FavoriteCurrencyUseCaseImpl(repository: repository)
+    FavoriteCurrencyUseCaseImpl(repository: MockFavoriteCurrencyRepositoryImpl())
   }
 }
 

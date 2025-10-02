@@ -131,9 +131,9 @@ final class ProductCell: UITableViewCell, Reusable {
           col.addItem(titleLabel)
           col.addItem(subtitleLabel).marginTop(4)
         }
-        row.addItem(trendImageView)
-          .width(Layout.trendWidth).height(Layout.trendWidth).marginRight(4)
         row.addItem(priceLabel).shrink(0).marginLeft(4)
+        row.addItem(trendImageView)
+          .width(Layout.trendWidth).height(Layout.trendWidth).marginLeft(4)
         row.addItem(favoriteButton).marginLeft(8)
       }
   }
