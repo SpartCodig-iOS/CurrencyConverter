@@ -8,7 +8,6 @@
 import UIKit
 
 public extension UIColor {
-
   private static func appDynamic(lightHex: String, darkHex: String) -> UIColor {
     UIColor { trait in
       trait.userInterfaceStyle == .dark ? UIColor(hex: darkHex) : UIColor(hex: lightHex)
@@ -27,3 +26,4 @@ public extension UIColor {
   static var appTrendUp: UIColor { appDynamic(lightHex: "34C759", darkHex: "30D158") }
   static var appTrendDown: UIColor { appDynamic(lightHex: "FF3B30", darkHex: "FF453A") }
 }
+
