@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ComposableArchitecture
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -15,7 +16,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = scene as? UIWindowScene else { return }
     let window = UIWindow(windowScene: windowScene)
-    window.rootViewController = ViewController()
+
+    let store = Store(initialState: RootReducer.State()) {
+      RootReducer()
+        ._printChanges()
+    }
+
+    let rootVC = RootViewController(store: store)
+    rootVC.navigationBar.prefersLargeTitles = false
+
+    window.rootViewController = rootVC
     window.makeKeyAndVisible()
     self.window = window
   }

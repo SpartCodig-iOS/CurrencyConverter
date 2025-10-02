@@ -13,6 +13,7 @@
 		7FECD3C22E8A31B6005D1583 /* PinLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3C12E8A31B6005D1583 /* PinLayout */; };
 		7FECD3C52E8A32D5005D1583 /* AsyncMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3C42E8A32D5005D1583 /* AsyncMoya */; };
 		7FECD3C82E8A32E9005D1583 /* Reusable in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3C72E8A32E9005D1583 /* Reusable */; };
+		7FECD4A32E8A79ED005D1583 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD4A22E8A79ED005D1583 /* Then */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +35,7 @@
 		7FECD0522E8A2DE9005D1583 /* Exceptions for "CurrencyConverter" folder in "CurrencyConverter" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Resurces/Info.plist,
+				Resources/Info.plist,
 			);
 			target = 7FECD0292E8A2DE7005D1583 /* CurrencyConverter */;
 		};
@@ -64,6 +65,7 @@
 				7FECD3C52E8A32D5005D1583 /* AsyncMoya in Frameworks */,
 				7FECD3BF2E8A31A4005D1583 /* FlexLayout in Frameworks */,
 				7FECD3BC2E8A3173005D1583 /* WeaveDI in Frameworks */,
+				7FECD4A32E8A79ED005D1583 /* Then in Frameworks */,
 				7FECD3C22E8A31B6005D1583 /* PinLayout in Frameworks */,
 				7FECD3B82E8A300C005D1583 /* ComposableArchitecture in Frameworks */,
 				7FECD3C82E8A32E9005D1583 /* Reusable in Frameworks */,
@@ -124,6 +126,7 @@
 				7FECD3C12E8A31B6005D1583 /* PinLayout */,
 				7FECD3C42E8A32D5005D1583 /* AsyncMoya */,
 				7FECD3C72E8A32E9005D1583 /* Reusable */,
+				7FECD4A22E8A79ED005D1583 /* Then */,
 			);
 			productName = CurrencyConverter;
 			productReference = 7FECD02A2E8A2DE7005D1583 /* CurrencyConverter.app */;
@@ -187,6 +190,7 @@
 				7FECD3C02E8A31B6005D1583 /* XCRemoteSwiftPackageReference "PinLayout" */,
 				7FECD3C32E8A32D5005D1583 /* XCRemoteSwiftPackageReference "AsyncMoya" */,
 				7FECD3C62E8A32E9005D1583 /* XCRemoteSwiftPackageReference "Reusable" */,
+				7FECD4A12E8A79ED005D1583 /* XCRemoteSwiftPackageReference "Then" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7FECD02B2E8A2DE7005D1583 /* Products */;
@@ -251,7 +255,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = N94CS4N6VR;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CurrencyConverter/Resurces/Info.plist;
+				INFOPLIST_FILE = CurrencyConverter/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
@@ -275,6 +279,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = "";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -290,7 +295,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = N94CS4N6VR;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CurrencyConverter/Resurces/Info.plist;
+				INFOPLIST_FILE = CurrencyConverter/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
@@ -304,6 +309,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "-strict-concurrency=complete";
 				PRODUCT_BUNDLE_IDENTIFIER = io.Roy.CurrencyConverter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -314,6 +320,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = "";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -379,6 +386,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -436,6 +444,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -523,15 +532,15 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.22.3;
+				minimumVersion = 1.22.0;
 			};
 		};
 		7FECD3BA2E8A3173005D1583 /* XCRemoteSwiftPackageReference "WeaveDI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Roy-wonji/WeaveDI";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.1.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7FECD3BD2E8A31A4005D1583 /* XCRemoteSwiftPackageReference "FlexLayout" */ = {
@@ -554,8 +563,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Roy-wonji/AsyncMoya";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.4;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7FECD3C62E8A32E9005D1583 /* XCRemoteSwiftPackageReference "Reusable" */ = {
@@ -564,6 +573,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 4.1.2;
+			};
+		};
+		7FECD4A12E8A79ED005D1583 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Roy-wonji/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -598,6 +615,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7FECD3C62E8A32E9005D1583 /* XCRemoteSwiftPackageReference "Reusable" */;
 			productName = Reusable;
+		};
+		7FECD4A22E8A79ED005D1583 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7FECD4A12E8A79ED005D1583 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
