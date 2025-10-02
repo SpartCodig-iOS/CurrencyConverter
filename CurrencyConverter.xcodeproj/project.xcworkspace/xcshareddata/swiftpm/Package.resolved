@@ -1,5 +1,5 @@
 {
-  "originHash" : "654e16315c7471ce8d252c93dbf202b878420e92d7e89dc125e5acee446632b7",
+  "originHash" : "845edc8089d06c6875ad92cbaa8bf89a287c92b48d230ad36197368ce15745a8",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Roy-wonji/AsyncMoya",
       "state" : {
-        "revision" : "d75bf7d14b8c20c1ed59b4659c0f86ea23ff93c3",
-        "version" : "1.1.4"
+        "branch" : "main",
+        "revision" : "df73007ff25fac5342314e6a50ccb9f2f5cd06bd"
       }
     },
     {
@@ -209,12 +209,21 @@
       }
     },
     {
+      "identity" : "then",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Roy-wonji/Then",
+      "state" : {
+        "revision" : "e421a7b3440a271834337694e6050133a3958bc7",
+        "version" : "2.7.0"
+      }
+    },
+    {
       "identity" : "weavedi",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Roy-wonji/WeaveDI",
       "state" : {
-        "revision" : "af50c6c97eec92945c389c89953e41154e4994f1",
-        "version" : "3.1.1"
+        "branch" : "main",
+        "revision" : "f285edcf9a252f9029b958a0a02aa2ed0181cfb2"
       }
     },
     {
