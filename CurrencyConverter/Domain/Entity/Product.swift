@@ -16,3 +16,4 @@ struct Product {
   let isFavorite: Bool
   let trend: RateTrend
 }
+

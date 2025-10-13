@@ -95,3 +95,4 @@ public extension ExchangeRates {
     )
   }
 }
+
