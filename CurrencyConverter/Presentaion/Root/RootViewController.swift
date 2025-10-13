@@ -28,6 +28,7 @@ final class RootViewController: UINavigationController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    delegate = self
     setupInitialViewController()
     observeNavigationStack()
   }
@@ -66,6 +67,25 @@ final class RootViewController: UINavigationController {
     } else if expectedCount < currentCount {
       // Pop view controller
       popViewController(animated: true)
+    }
+  }
+}
+
+extension RootViewController: UINavigationControllerDelegate {
+  func navigationController(
+    _ navigationController: UINavigationController,
+    didShow viewController: UIViewController,
+    animated: Bool
+  ) {
+    let visibleCount = navigationController.viewControllers.count - 1
+
+    store.withState { state in
+      guard state.path.count > visibleCount,
+            let lastID = state.path.ids.last else {
+        return
+      }
+
+      store.send(.path(.popFrom(id: lastID)))
     }
   }
 }

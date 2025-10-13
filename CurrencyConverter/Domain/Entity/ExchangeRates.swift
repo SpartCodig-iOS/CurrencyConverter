@@ -14,7 +14,7 @@ public struct ExchangeRates: Sendable, Equatable {
   public let provider: URL?
   public let documentation: URL?
   public let termsOfUse: URL?
-  public let rates: [CurrencyCode: Double]
+  public var rates: [CurrencyCode: Double]
 
   public init(
     base: CurrencyCode,
@@ -40,3 +40,59 @@ public struct ExchangeRates: Sendable, Equatable {
     return amount * rate
   }
 }
+
+// MARK: - Mock Data Helpers
+
+public extension ExchangeRates {
+
+  /// Creates a reusable mock instance for testing or previews.
+  static func sample(
+    base: String = "USD",
+    rates: [String: Double] = [
+      "KRW": 1_350.25,
+      "JPY": 148.56,
+      "EUR": 0.91
+    ],
+    timestamp: Date = Date(timeIntervalSince1970: 1_704_000_000),
+    nextUpdateInterval: TimeInterval = 3600,
+    provider: URL? = nil,
+    documentation: URL? = nil,
+    termsOfUse: URL? = nil
+  ) -> ExchangeRates {
+    ExchangeRates(
+      base: CurrencyCode(rawValue: base),
+      lastUpdatedAt: timestamp,
+      nextUpdateAt: timestamp.addingTimeInterval(nextUpdateInterval),
+      provider: provider,
+      documentation: documentation,
+      termsOfUse: termsOfUse,
+      rates: rates.reduce(into: [CurrencyCode: Double]()) { partialResult, entry in
+        partialResult[CurrencyCode(rawValue: entry.key)] = entry.value
+      }
+    )
+  }
+
+  /// Returns a copy of the exchange rates replacing the provided properties.
+  func updating(
+    base: String? = nil,
+    rates: [String: Double]? = nil,
+    lastUpdatedAt: Date? = nil,
+    nextUpdateAt: Date? = nil,
+    provider: URL?? = nil,
+    documentation: URL?? = nil,
+    termsOfUse: URL?? = nil
+  ) -> ExchangeRates {
+    ExchangeRates(
+      base: base.map { CurrencyCode(rawValue: $0) } ?? self.base,
+      lastUpdatedAt: lastUpdatedAt ?? self.lastUpdatedAt,
+      nextUpdateAt: nextUpdateAt ?? self.nextUpdateAt,
+      provider: provider ?? self.provider,
+      documentation: documentation ?? self.documentation,
+      termsOfUse: termsOfUse ?? self.termsOfUse,
+      rates: (rates?.reduce(into: [CurrencyCode: Double]()) { partialResult, entry in
+        partialResult[CurrencyCode(rawValue: entry.key)] = entry.value
+      }) ?? self.rates
+    )
+  }
+}
+
