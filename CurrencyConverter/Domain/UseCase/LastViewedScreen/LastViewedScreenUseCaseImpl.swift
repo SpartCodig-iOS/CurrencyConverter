@@ -7,6 +7,7 @@
 
 import Foundation
 import WeaveDI
+import ComposableArchitecture
 
 public struct LastViewedScreenUseCaseImpl: LastViewedScreenInterface {
   private let repository: LastViewedScreenInterface
@@ -29,6 +30,13 @@ public struct LastViewedScreenUseCaseImpl: LastViewedScreenInterface {
 }
 
 extension LastViewedScreenUseCaseImpl: InjectedKey {
+  public static var previewValue:  LastViewedScreenInterface {
+    let repository: LastViewedScreenInterface = UnifiedDI.register(LastViewedScreenInterface.self) {
+      LastViewedScreenRepositoryImpl()
+    }
+    return LastViewedScreenUseCaseImpl(repository: repository)
+  }
+  
   public static var liveValue: LastViewedScreenInterface {
     let repository: LastViewedScreenInterface = UnifiedDI.register(LastViewedScreenInterface.self) {
       LastViewedScreenRepositoryImpl()
@@ -42,7 +50,7 @@ extension LastViewedScreenUseCaseImpl: InjectedKey {
 }
 
 
-
+//@AutoSyncExtension
 public extension InjectedValues {
   var lastViewedScreenUseCase: LastViewedScreenInterface {
     get { self[LastViewedScreenUseCaseImpl.self] }

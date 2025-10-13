@@ -7,6 +7,7 @@
 
 import Foundation
 import WeaveDI
+import ComposableArchitecture
 
 public struct FavoriteCurrencyUseCaseImpl: FavoriteCurrencyInterface {
   private let repository: FavoriteCurrencyInterface
@@ -25,6 +26,13 @@ public struct FavoriteCurrencyUseCaseImpl: FavoriteCurrencyInterface {
 }
 
 extension FavoriteCurrencyUseCaseImpl: InjectedKey {
+  public static var previewValue:  FavoriteCurrencyInterface {
+    let repository: FavoriteCurrencyInterface = UnifiedDI.register(FavoriteCurrencyInterface.self) {
+      FavoriteCurrencyRepositoryImpl()
+    }
+    return FavoriteCurrencyUseCaseImpl(repository: repository)
+  }
+  
   public static var liveValue: FavoriteCurrencyInterface {
     let repository: FavoriteCurrencyInterface = UnifiedDI.register(FavoriteCurrencyInterface.self) {
       FavoriteCurrencyRepositoryImpl()
@@ -36,8 +44,8 @@ extension FavoriteCurrencyUseCaseImpl: InjectedKey {
     FavoriteCurrencyUseCaseImpl(repository: MockFavoriteCurrencyRepositoryImpl())
   }
 }
-
-
+//
+//@AutoSyncExtension
 public extension InjectedValues {
   var favoriteCurrencyUseCase: FavoriteCurrencyInterface {
     get { self[FavoriteCurrencyUseCaseImpl.self] }

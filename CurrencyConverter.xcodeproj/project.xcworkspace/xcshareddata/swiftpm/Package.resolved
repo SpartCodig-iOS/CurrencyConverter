@@ -223,7 +223,7 @@
       "location" : "https://github.com/Roy-wonji/WeaveDI",
       "state" : {
         "branch" : "main",
-        "revision" : "b3158df58f2382ee9a35f927e3eed510473f423c"
+        "revision" : "f44316626e01b61e4d1411fd48e6a8f7e9284f44"
       }
     },
     {
@@ -231,8 +231,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "b2ed9eabefe56202ee4939dd9fc46b6241c88317",
-        "version" : "1.6.1"
+        "revision" : "4c27acf5394b645b70d8ba19dc249c0472d5f618",
+        "version" : "1.7.0"
       }
     },
     {

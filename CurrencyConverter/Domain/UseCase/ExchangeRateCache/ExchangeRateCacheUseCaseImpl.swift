@@ -7,6 +7,7 @@
 
 import Foundation
 import WeaveDI
+import ComposableArchitecture
 
 public struct ExchangeRateCacheUseCaseImpl: ExchangeRateCacheInterface {
   private let repository: ExchangeRateCacheInterface
@@ -29,6 +30,13 @@ public struct ExchangeRateCacheUseCaseImpl: ExchangeRateCacheInterface {
 }
 
 extension ExchangeRateCacheUseCaseImpl: InjectedKey {
+  public static var previewValue: ExchangeRateCacheInterface {
+    let repository: ExchangeRateCacheInterface = UnifiedDI.register(ExchangeRateCacheInterface.self) {
+      ExchangeRateCacheRepositoryImpl()
+    }
+    return ExchangeRateCacheUseCaseImpl(repository: repository)
+  }
+  
   public static var liveValue: ExchangeRateCacheInterface {
     let repository: ExchangeRateCacheInterface = UnifiedDI.register(ExchangeRateCacheInterface.self) {
       ExchangeRateCacheRepositoryImpl()
@@ -41,6 +49,7 @@ extension ExchangeRateCacheUseCaseImpl: InjectedKey {
   }
 }
 
+//@AutoSyncExtension
 public extension InjectedValues {
   var exchangeRateCacheUseCase: ExchangeRateCacheInterface {
     get { self[ExchangeRateCacheUseCaseImpl.self] }
