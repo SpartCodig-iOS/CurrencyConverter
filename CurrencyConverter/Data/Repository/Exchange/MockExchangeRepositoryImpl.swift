@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class MockExchangeRepositoryImpl: ExchangeRateInterface {
+public final class MockExchangeRepositoryImpl: ExchangeRateInterface {
   /// Currency-specific results to return from `getExchangeRates`.
   var responses: [String: Result<ExchangeRates?, Error>] = [:]
   /// Fallback result used when a currency-specific response is not provided.
@@ -15,7 +15,7 @@ final class MockExchangeRepositoryImpl: ExchangeRateInterface {
 
   nonisolated public init() {}
 
-  func getExchangeRates(currency: String) async throws -> ExchangeRates? {
+  public func getExchangeRates(currency: String) async throws -> ExchangeRates? {
     let response = responses[currency] ?? defaultResponse
     switch response {
       case .success(let value):

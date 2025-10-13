@@ -6,7 +6,7 @@
 //
 
 import ComposableArchitecture
-
+import Foundation
 import WeaveDI
 
 public struct ExchangeUseCaseImpl: ExchangeRateInterface {
@@ -21,8 +21,7 @@ public struct ExchangeUseCaseImpl: ExchangeRateInterface {
   }
 }
 
-
-extension ExchangeUseCaseImpl: InjectedKey {
+extension ExchangeUseCaseImpl: DependencyKey {
   public static var previewValue:  ExchangeRateInterface {
     let repository: ExchangeRateInterface = UnifiedDI.register(ExchangeRateInterface.self) {
       ExchangeRepositoryImpl()
@@ -42,8 +41,8 @@ extension ExchangeUseCaseImpl: InjectedKey {
   }
 }
 
-//@AutoSyncExtension
-public extension InjectedValues {
+@AutoSyncExtension
+public extension DependencyValues {
   var exchangeUseCase: ExchangeRateInterface {
     get { self[ExchangeUseCaseImpl.self] }
     set { self[ExchangeUseCaseImpl.self] = newValue }

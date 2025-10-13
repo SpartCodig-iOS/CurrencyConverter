@@ -29,7 +29,7 @@ public struct ExchangeRateCacheUseCaseImpl: ExchangeRateCacheInterface {
   }
 }
 
-extension ExchangeRateCacheUseCaseImpl: InjectedKey {
+extension ExchangeRateCacheUseCaseImpl: DependencyKey {
   public static var previewValue: ExchangeRateCacheInterface {
     let repository: ExchangeRateCacheInterface = UnifiedDI.register(ExchangeRateCacheInterface.self) {
       ExchangeRateCacheRepositoryImpl()
@@ -49,8 +49,8 @@ extension ExchangeRateCacheUseCaseImpl: InjectedKey {
   }
 }
 
-//@AutoSyncExtension
-public extension InjectedValues {
+@AutoSyncExtension
+public extension DependencyValues {
   var exchangeRateCacheUseCase: ExchangeRateCacheInterface {
     get { self[ExchangeRateCacheUseCaseImpl.self] }
     set { self[ExchangeRateCacheUseCaseImpl.self] = newValue }

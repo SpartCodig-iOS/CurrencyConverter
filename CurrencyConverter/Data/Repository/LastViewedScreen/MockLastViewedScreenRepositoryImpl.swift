@@ -8,34 +8,34 @@
 import Foundation
 
 @MainActor
-final class MockLastViewedScreenRepositoryImpl: LastViewedScreenInterface {
-  var storage: LastViewedScreen?
+public final class MockLastViewedScreenRepositoryImpl: LastViewedScreenInterface {
+  public var storage: LastViewedScreen?
 
   nonisolated public init(initial: LastViewedScreen? = nil) {
     self.storage = initial
   }
 
-  func loadLastViewedScreen() async throws -> LastViewedScreen? {
+  public func loadLastViewedScreen() async throws -> LastViewedScreen? {
     storage
   }
 
-  func updateLastViewedScreen(_ screen: LastViewedScreen) async throws {
+  public func updateLastViewedScreen(_ screen: LastViewedScreen) async throws {
     storage = screen
   }
 
-  func clearLastViewedScreen() async throws {
+  public func clearLastViewedScreen() async throws {
     storage = nil
   }
 }
 
 extension MockLastViewedScreenRepositoryImpl {
-  static func sampleCalculator() -> MockLastViewedScreenRepositoryImpl {
+  public static func sampleCalculator() -> MockLastViewedScreenRepositoryImpl {
     MockLastViewedScreenRepositoryImpl(
       initial: LastViewedScreen(type: .calculator, currencyCode: "USD")
     )
   }
 
-  static func sampleList() -> MockLastViewedScreenRepositoryImpl {
+  public static func sampleList() -> MockLastViewedScreenRepositoryImpl {
     MockLastViewedScreenRepositoryImpl(
       initial: LastViewedScreen(type: .list)
     )

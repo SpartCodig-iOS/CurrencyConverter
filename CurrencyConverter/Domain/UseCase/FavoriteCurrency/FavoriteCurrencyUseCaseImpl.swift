@@ -25,7 +25,7 @@ public struct FavoriteCurrencyUseCaseImpl: FavoriteCurrencyInterface {
   }
 }
 
-extension FavoriteCurrencyUseCaseImpl: InjectedKey {
+extension FavoriteCurrencyUseCaseImpl: DependencyKey {
   public static var previewValue:  FavoriteCurrencyInterface {
     let repository: FavoriteCurrencyInterface = UnifiedDI.register(FavoriteCurrencyInterface.self) {
       FavoriteCurrencyRepositoryImpl()
@@ -44,9 +44,10 @@ extension FavoriteCurrencyUseCaseImpl: InjectedKey {
     FavoriteCurrencyUseCaseImpl(repository: MockFavoriteCurrencyRepositoryImpl())
   }
 }
-//
-//@AutoSyncExtension
-public extension InjectedValues {
+
+
+@AutoSyncExtension
+public extension DependencyValues {
   var favoriteCurrencyUseCase: FavoriteCurrencyInterface {
     get { self[FavoriteCurrencyUseCaseImpl.self] }
     set { self[FavoriteCurrencyUseCaseImpl.self] = newValue }

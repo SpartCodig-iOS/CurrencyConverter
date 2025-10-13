@@ -29,14 +29,7 @@ public struct LastViewedScreenUseCaseImpl: LastViewedScreenInterface {
   }
 }
 
-extension LastViewedScreenUseCaseImpl: InjectedKey {
-  public static var previewValue:  LastViewedScreenInterface {
-    let repository: LastViewedScreenInterface = UnifiedDI.register(LastViewedScreenInterface.self) {
-      LastViewedScreenRepositoryImpl()
-    }
-    return LastViewedScreenUseCaseImpl(repository: repository)
-  }
-  
+extension LastViewedScreenUseCaseImpl: DependencyKey {
   public static var liveValue: LastViewedScreenInterface {
     let repository: LastViewedScreenInterface = UnifiedDI.register(LastViewedScreenInterface.self) {
       LastViewedScreenRepositoryImpl()
@@ -51,7 +44,7 @@ extension LastViewedScreenUseCaseImpl: InjectedKey {
 
 
 //@AutoSyncExtension
-public extension InjectedValues {
+public extension DependencyValues {
   var lastViewedScreenUseCase: LastViewedScreenInterface {
     get { self[LastViewedScreenUseCaseImpl.self] }
     set { self[LastViewedScreenUseCaseImpl.self] = newValue }

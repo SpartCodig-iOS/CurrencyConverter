@@ -2,6 +2,7 @@ import Foundation
 import Testing
 import WeaveDI
 @testable import CurrencyConverter
+internal import Dependencies
 
 @MainActor
 struct LastViewedScreenRepositoryMockTests {
