@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7F6D60DD2E91310C008ED931 /* WeaveDI in Frameworks */ = {isa = PBXBuildFile; productRef = 7F6D60DC2E91310C008ED931 /* WeaveDI */; };
+		7F6984562E9CBF6A00446072 /* WeaveDI in Frameworks */ = {isa = PBXBuildFile; productRef = 7F6984552E9CBF6A00446072 /* WeaveDI */; };
 		7FECD3B82E8A300C005D1583 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3B72E8A300C005D1583 /* ComposableArchitecture */; };
 		7FECD3BF2E8A31A4005D1583 /* FlexLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3BE2E8A31A4005D1583 /* FlexLayout */; };
 		7FECD3C22E8A31B6005D1583 /* PinLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3C12E8A31B6005D1583 /* PinLayout */; };
@@ -69,7 +69,7 @@
 				7FECD3C22E8A31B6005D1583 /* PinLayout in Frameworks */,
 				7FECD3B82E8A300C005D1583 /* ComposableArchitecture in Frameworks */,
 				7FECD3C82E8A32E9005D1583 /* Reusable in Frameworks */,
-				7F6D60DD2E91310C008ED931 /* WeaveDI in Frameworks */,
+				7F6984562E9CBF6A00446072 /* WeaveDI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,7 +128,7 @@
 				7FECD3C42E8A32D5005D1583 /* AsyncMoya */,
 				7FECD3C72E8A32E9005D1583 /* Reusable */,
 				7FECD4A22E8A79ED005D1583 /* Then */,
-				7F6D60DC2E91310C008ED931 /* WeaveDI */,
+				7F6984552E9CBF6A00446072 /* WeaveDI */,
 			);
 			productName = CurrencyConverter;
 			productReference = 7FECD02A2E8A2DE7005D1583 /* CurrencyConverter.app */;
@@ -192,7 +192,7 @@
 				7FECD3C32E8A32D5005D1583 /* XCRemoteSwiftPackageReference "AsyncMoya" */,
 				7FECD3C62E8A32E9005D1583 /* XCRemoteSwiftPackageReference "Reusable" */,
 				7FECD4A12E8A79ED005D1583 /* XCRemoteSwiftPackageReference "Then" */,
-				7F6D60DB2E91310C008ED931 /* XCRemoteSwiftPackageReference "WeaveDI" */,
+				7F6984542E9CBF6A00446072 /* XCRemoteSwiftPackageReference "WeaveDI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7FECD02B2E8A2DE7005D1583 /* Products */;
@@ -528,12 +528,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		7F6D60DB2E91310C008ED931 /* XCRemoteSwiftPackageReference "WeaveDI" */ = {
+		7F6984542E9CBF6A00446072 /* XCRemoteSwiftPackageReference "WeaveDI" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Roy-wonji/WeaveDI";
+			repositoryURL = "https://github.com/Roy-wonji/WeaveDI.git";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.3.1;
 			};
 		};
 		7FECD3B62E8A300C005D1583 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
@@ -587,9 +587,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7F6D60DC2E91310C008ED931 /* WeaveDI */ = {
+		7F6984552E9CBF6A00446072 /* WeaveDI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7F6D60DB2E91310C008ED931 /* XCRemoteSwiftPackageReference "WeaveDI" */;
+			package = 7F6984542E9CBF6A00446072 /* XCRemoteSwiftPackageReference "WeaveDI" */;
 			productName = WeaveDI;
 		};
 		7FECD3B72E8A300C005D1583 /* ComposableArchitecture */ = {

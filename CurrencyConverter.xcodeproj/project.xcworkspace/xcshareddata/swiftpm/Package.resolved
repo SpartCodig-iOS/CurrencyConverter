@@ -1,5 +1,5 @@
 {
-  "originHash" : "845edc8089d06c6875ad92cbaa8bf89a287c92b48d230ad36197368ce15745a8",
+  "originHash" : "f711b6338498b3a20c53c1687e7a111a71daa86bab070c019238c1b9a8ed77b3",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -220,10 +220,10 @@
     {
       "identity" : "weavedi",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Roy-wonji/WeaveDI",
+      "location" : "https://github.com/Roy-wonji/WeaveDI.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "c84f831c03ca57e90bdcb8b965ae31aaca703711"
+        "revision" : "89728f122d41633d8ebac182fc15040065e2492c",
+        "version" : "3.3.1"
       }
     },
     {
