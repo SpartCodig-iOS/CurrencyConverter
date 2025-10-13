@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F6D60DD2E91310C008ED931 /* WeaveDI in Frameworks */ = {isa = PBXBuildFile; productRef = 7F6D60DC2E91310C008ED931 /* WeaveDI */; };
 		7FECD3B82E8A300C005D1583 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3B72E8A300C005D1583 /* ComposableArchitecture */; };
-		7FECD3BC2E8A3173005D1583 /* WeaveDI in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3BB2E8A3173005D1583 /* WeaveDI */; };
 		7FECD3BF2E8A31A4005D1583 /* FlexLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3BE2E8A31A4005D1583 /* FlexLayout */; };
 		7FECD3C22E8A31B6005D1583 /* PinLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3C12E8A31B6005D1583 /* PinLayout */; };
 		7FECD3C52E8A32D5005D1583 /* AsyncMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 7FECD3C42E8A32D5005D1583 /* AsyncMoya */; };
@@ -65,11 +65,11 @@
 			files = (
 				7FECD3C52E8A32D5005D1583 /* AsyncMoya in Frameworks */,
 				7FECD3BF2E8A31A4005D1583 /* FlexLayout in Frameworks */,
-				7FECD3BC2E8A3173005D1583 /* WeaveDI in Frameworks */,
 				7FECD4A32E8A79ED005D1583 /* Then in Frameworks */,
 				7FECD3C22E8A31B6005D1583 /* PinLayout in Frameworks */,
 				7FECD3B82E8A300C005D1583 /* ComposableArchitecture in Frameworks */,
 				7FECD3C82E8A32E9005D1583 /* Reusable in Frameworks */,
+				7F6D60DD2E91310C008ED931 /* WeaveDI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,12 +123,12 @@
 			name = CurrencyConverter;
 			packageProductDependencies = (
 				7FECD3B72E8A300C005D1583 /* ComposableArchitecture */,
-				7FECD3BB2E8A3173005D1583 /* WeaveDI */,
 				7FECD3BE2E8A31A4005D1583 /* FlexLayout */,
 				7FECD3C12E8A31B6005D1583 /* PinLayout */,
 				7FECD3C42E8A32D5005D1583 /* AsyncMoya */,
 				7FECD3C72E8A32E9005D1583 /* Reusable */,
 				7FECD4A22E8A79ED005D1583 /* Then */,
+				7F6D60DC2E91310C008ED931 /* WeaveDI */,
 			);
 			productName = CurrencyConverter;
 			productReference = 7FECD02A2E8A2DE7005D1583 /* CurrencyConverter.app */;
@@ -187,12 +187,12 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				7FECD3B62E8A300C005D1583 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
-				7FECD3BA2E8A3173005D1583 /* XCRemoteSwiftPackageReference "WeaveDI" */,
 				7FECD3BD2E8A31A4005D1583 /* XCRemoteSwiftPackageReference "FlexLayout" */,
 				7FECD3C02E8A31B6005D1583 /* XCRemoteSwiftPackageReference "PinLayout" */,
 				7FECD3C32E8A32D5005D1583 /* XCRemoteSwiftPackageReference "AsyncMoya" */,
 				7FECD3C62E8A32E9005D1583 /* XCRemoteSwiftPackageReference "Reusable" */,
 				7FECD4A12E8A79ED005D1583 /* XCRemoteSwiftPackageReference "Then" */,
+				7F6D60DB2E91310C008ED931 /* XCRemoteSwiftPackageReference "WeaveDI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7FECD02B2E8A2DE7005D1583 /* Products */;
@@ -270,6 +270,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = io.Roy.CurrencyConverter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -527,20 +528,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		7F6D60DB2E91310C008ED931 /* XCRemoteSwiftPackageReference "WeaveDI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Roy-wonji/WeaveDI";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		7FECD3B62E8A300C005D1583 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.22.0;
-			};
-		};
-		7FECD3BA2E8A3173005D1583 /* XCRemoteSwiftPackageReference "WeaveDI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Roy-wonji/WeaveDI";
-			requirement = {
-				branch = main;
-				kind = branch;
 			};
 		};
 		7FECD3BD2E8A31A4005D1583 /* XCRemoteSwiftPackageReference "FlexLayout" */ = {
@@ -586,15 +587,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		7F6D60DC2E91310C008ED931 /* WeaveDI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7F6D60DB2E91310C008ED931 /* XCRemoteSwiftPackageReference "WeaveDI" */;
+			productName = WeaveDI;
+		};
 		7FECD3B72E8A300C005D1583 /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7FECD3B62E8A300C005D1583 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
-		};
-		7FECD3BB2E8A3173005D1583 /* WeaveDI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7FECD3BA2E8A3173005D1583 /* XCRemoteSwiftPackageReference "WeaveDI" */;
-			productName = WeaveDI;
 		};
 		7FECD3BE2E8A31A4005D1583 /* FlexLayout */ = {
 			isa = XCSwiftPackageProductDependency;
